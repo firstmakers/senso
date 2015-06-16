@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.thomasbolz.javafx.*?>
+
+<fx:root prefHeight="150.0" prefWidth="275.0" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#31a0eb" height="150.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" style="-fx-arc-height: 10; -fx-arc-width: 10;" width="275.0" />
+      <ProgressBar fx:id="progressBar" layoutX="12.0" layoutY="133.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="12.0" prefWidth="247.0" progress="0.0" style="-fx-accent: red;" />
+
+      <NumberSpinner fx:id="interval" layoutX="133" layoutY="8.0" prefWidth="128" />
+
+      <Label layoutX="12.0" layoutY="12.0" text="Intervalo" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="12.0" layoutY="42.0" text="Muestras" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <NumberSpinner fx:id="samples" layoutX="133" layoutY="38.0" prefWidth="128" />
+      <Separator layoutX="14.0" layoutY="111.0" prefHeight="3.0" prefWidth="247.0" />
+      <Text fx:id="sampleText" fill="WHITE" layoutX="13.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0/0" textAlignment="RIGHT" wrappingWidth="247.0" />
+      <Button fx:id="btnStart" layoutX="13.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" textFill="WHITE" />
+      <Button fx:id="btnPause" layoutX="67.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" textFill="WHITE" />
+      <Button fx:id="btnStop" layoutX="121.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" textFill="WHITE" />
+      <Button fx:id="btnSave" layoutX="211.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" textAlignment="RIGHT" textFill="WHITE" />
+
+   </children>
+</fx:root>

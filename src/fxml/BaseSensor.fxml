@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root fx:id="container" alignment="CENTER" prefHeight="65.0" prefWidth="265.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane prefHeight="65.0" prefWidth="265.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Rectangle id="background" fx:id="background" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="65.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" style="-fx-arc-width: 10; -fx-arc-height: 10;" styleClass="background" width="275.0" />
+            <ImageView id="icon" fx:id="icon" fitHeight="60.0" fitWidth="60.0" layoutX="6.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+            </ImageView>
+            <Text id="unit" fx:id="unit" fill="WHITE" layoutX="226.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ºC" textAlignment="RIGHT" wrappingWidth="32.5315055847168">
+               <font>
+                  <Font size="14.0" />
+               </font></Text>
+            <Text id="decimal" fx:id="decimal" fill="WHITE" layoutX="250.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+            <Text id="integer" fx:id="integer" fill="WHITE" layoutX="90.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0." textAlignment="RIGHT" wrappingWidth="158.85365676879883">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Text>
+            <ColorPicker id="picker" fx:id="colorPicker" layoutX="212.0" layoutY="39.0" prefHeight="26.0" prefWidth="33.0" style="-fx-background-color: transparent;" styleClass="button" />
+            <CheckBox fx:id="cbx" layoutX="241.0" layoutY="44.0" mnemonicParsing="false" />
+            <TextField fx:id="name" layoutX="60.0" layoutY="38.0" prefHeight="26.0" prefWidth="148.0" styleClass="sensorname" />
+         </children>
+      </AnchorPane>
+   </children>
+</fx:root>

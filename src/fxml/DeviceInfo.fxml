@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root prefHeight="75.0" prefWidth="275.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane>
+         <children>
+            <Rectangle id="background" arcHeight="5.0" arcWidth="5.0" fill="#635e98" height="75.0" style="-fx-arc-height: 10; -fx-arc-width: 10;" styleClass="background-device" width="275.0" />
+            <ImageView id="icon" fx:id="icon" fitHeight="66.0" fitWidth="85.0" layoutX="207.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/usb_attach.png" />
+               </image>
+            </ImageView>
+            <Text fx:id="status" fill="WHITE" layoutX="13.0" layoutY="57.0" style="-fx-font-weight: bold;" text="Estado:" />
+            <Text fx:id="firmware" fill="WHITE" layoutX="13.0" layoutY="39.0" style="-fx-font-weight: bold;" text="Firmware:" />
+            <Text fx:id="name" fill="WHITE" layoutX="13.0" layoutY="22.0" style="-fx-font-weight: bold;" text="Nombre: " />
+         </children>
+      </AnchorPane>
+   </children>
+</fx:root>
