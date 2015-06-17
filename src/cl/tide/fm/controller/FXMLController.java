@@ -15,6 +15,9 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -29,6 +32,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import org.hid4java.HidDevice;
 
 import org.hid4java.HidException;
@@ -52,13 +56,12 @@ public class FXMLController implements Initializable, FmSensoListener {
     private Timer mTimer;
     private boolean pause = true;
     private int totalSamples = 0;
- 
-    FileManager fm ;
-    
+
+    FileManager fm;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    
+
         deviceInfo = new DeviceInfo();
         control = new Control();
         control.samples.setNumber(new BigDecimal(300));
@@ -67,7 +70,6 @@ public class FXMLController implements Initializable, FmSensoListener {
             @Override
             public void handle(ActionEvent event) {
                 clickStart();
-              
             }
         });
         control.btnPause.setOnAction(new EventHandler<ActionEvent>() {
@@ -85,7 +87,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         control.btnSave.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                clickSave(((Node)event.getTarget()).getScene().getWindow());
+                clickSave(((Node) event.getTarget()).getScene().getWindow());
             }
         });
         try {
@@ -99,7 +101,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         }
         //sensorContainer.getChildren().add(deviceInfo);
         sensorContainer.getChildren().add(control);
-        
+
         mChart = new ChartController(lineChart);
         mChart.setExternalSensors(ExternalSensorView);
         mChart.setInternalSensor(InternalSensorView);
@@ -109,15 +111,16 @@ public class FXMLController implements Initializable, FmSensoListener {
         if (fmSenso.isConnected()) {
             fmSenso.start();
         }
-        if (InternalSensorView.isEmpty()&& fmSenso.isConnected()) {
+        if (InternalSensorView.isEmpty() && fmSenso.isConnected()) {
             addInternalSensor();
         }
         setStatusDevice(fmSenso.getCurrentDevice());
         fm = new FileManager(ExternalSensorView);
     }
     /*
-    *Agrega los sensores internos de la tarjeta senso
-    */
+     *Agrega los sensores internos de la tarjeta senso
+     */
+
     public void addInternalSensor() {
         //add internal sensor
         Sensor s = fmSenso.getSensorManager().getInternalSensors().get(0);
@@ -129,7 +132,7 @@ public class FXMLController implements Initializable, FmSensoListener {
     }
 
     /*
-    */
+     */
     public void close() {
         fmSenso.stop();
     }
@@ -222,6 +225,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             sensor.setCustomSerie(new CustomSeries(sensor.getName()));
             ExternalSensorView.add(sensor);
             addView(sensor);
+
         }
     }
 
@@ -247,7 +251,11 @@ public class FXMLController implements Initializable, FmSensoListener {
                 synchronized (FXMLController.this) {
                     sensorContainer.getChildren().add(node);
                     mChart.addSerie(view.getCustomSerie().getSerie());
+                    Timeline fadein = new Timeline(
+                            new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
+                            new KeyFrame(new Duration(300), new KeyValue(node.opacityProperty(), 1.0)));
                     view.setSerieColor();
+                    fadein.play();
                 }
             }
         });
@@ -260,42 +268,52 @@ public class FXMLController implements Initializable, FmSensoListener {
                 SensorView view = (SensorView) node;
                 synchronized (FXMLController.this) {
                     mChart.removeSerie(view.getCustomSerie().getSerie());
-                    //mTab.removeColumn(view.getColumn());
-                    sensorContainer.getChildren().remove(node);
+                    Timeline fade = new Timeline(
+                            new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
+                            new KeyFrame(new Duration(600), new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            sensorContainer.getChildren().remove(node);
+                        }
+                    }, new KeyValue(node.opacityProperty(), 0.0)));
+                    fade.play();               
                 }
             }
         });
     }
 
-    private void clickStart() {        
+    private void clickStart() {
         System.out.println("Clicked Start");
-        //int numberOfSamples = control.samples.getNumber().intValue();
-        control.btnSave.setDisable(true);
-        control.btnStart.setDisable(true);
-        if(totalSamples > 0){
+        if (totalSamples > 0) {
             showDialog();
+            return;
         }
-        long userInterval = control.interval.getNumber().intValue()*1000;
+        long userInterval = control.interval.getNumber().intValue() * 1000;
+        int smp = control.samples.getNumber().intValue();
         fm.setHeader(getHeader());
-        if(fmSenso.isRunning()){
+        if (fmSenso.isRunning() && userInterval > 999 && smp > 0) {
+            control.btnSave.setDisable(true);
+            control.btnStart.setDisable(true);
             mTimer = new Timer();
-            mTimer.schedule(new TimerTask() { 
+            mTimer.schedule(new TimerTask() {
                 @Override
-                public void run() {   
+                public void run() {
 
-                    if(totalSamples >= control.samples.getNumber().intValue()){
-                         clickStop();
-                         return;
-                    } 
+                    if (totalSamples >= control.samples.getNumber().intValue()) {
+                        clickStop();
+                        return;
+                    }
                     totalSamples++;
-                    fm.streamRow(getSamples(),null);
-                    updateUI();                      
+                    fm.streamRow(getSamples(), null);
+                    updateUI();
                 }
-            },0, userInterval);
+            }, 0, userInterval);
+
         }
     }
+
     private void showDialog() {
-        
+
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Senso");
         alert.setHeaderText("Atención, hay una medición disponible");
@@ -303,25 +321,24 @@ public class FXMLController implements Initializable, FmSensoListener {
         
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
-        // ... user chose OK
+            System.out.println("calling save method");
             clickSave(control.btnSave.getScene().getWindow());
         } else {
-        // ... user chose CANCEL or closed the dialog
+            System.out.println("calling clear method");
             clear();
         }
     }
-    
-    private String[] getHeader(){
-        String [] header = new String[ExternalSensorView.size() + InternalSensorView.size() + 1];
+
+    private String[] getHeader() {
+        String[] header = new String[ExternalSensorView.size() + InternalSensorView.size() + 1];
         header[0] = "Hora";
         header[1] = InternalSensorView.get(0).getName();
-        for(int i = 2; i <header.length;i++)
-        {
-            header[i] = ExternalSensorView.get(i-2).getName();
+        for (int i = 2; i < header.length; i++) {
+            header[i] = ExternalSensorView.get(i - 2).getName();
         }
         return header;
     }
-    
+
     private Object[] getSamples() {
         final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date d = new Date();
@@ -342,16 +359,16 @@ public class FXMLController implements Initializable, FmSensoListener {
         }
         return ob;
     }
-    
-    private void updateUI(){
-       
+
+    private void updateUI() {
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                double n = control.samples.getNumber().intValue();               
-               // System.out.println("updating ui "+totalSamples+"/"+n  +(totalSamples/n)+ " %");
-                control.sampleText.setText(totalSamples+"/"+ (int)n);
-                control.progressBar.setProgress(totalSamples/n);
+                double n = control.samples.getNumber().intValue();
+                // System.out.println("updating ui "+totalSamples+"/"+n  +(totalSamples/n)+ " %");
+                control.sampleText.setText(totalSamples + "/" + (int) n);
+                control.progressBar.setProgress(totalSamples / n);
             }
         });
     }
@@ -360,10 +377,10 @@ public class FXMLController implements Initializable, FmSensoListener {
         System.out.println("Clicked Pause");
         control.btnStart.setDisable(false);
         control.btnSave.setDisable(false);
-        if(mTimer!= null){
+        if (mTimer != null) {
             mTimer.cancel();
             this.pause = true;
-            mTimer=null;
+            mTimer = null;
         }
     }
 
@@ -371,12 +388,12 @@ public class FXMLController implements Initializable, FmSensoListener {
         System.out.println("Clicked Stop");
         control.btnSave.setDisable(false);
         control.btnStart.setDisable(false);
-        
-        if(mTimer != null){
+
+        if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
         }
-        
+
     }
 
     private void clickSave(Window win) {
@@ -395,11 +412,16 @@ public class FXMLController implements Initializable, FmSensoListener {
             }
         }
     }
-    
-    private void clear(){
-        control.sampleText.setText("0/0");
-        control.progressBar.setProgress(0.0); 
+
+    private void clear() {
         totalSamples = 0;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                control.sampleText.setText("0/0");
+                control.progressBar.setProgress(0.0);
+            }
+        });
     }
-    
+
 }

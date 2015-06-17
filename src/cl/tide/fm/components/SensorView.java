@@ -10,6 +10,7 @@ import cl.tide.fm.model.Sensor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -27,6 +28,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 /**
  *
