@@ -27,9 +27,11 @@ public class TemperatureView extends SensorView {
         s.addListener(new SensorListener() {
  
             @Override
-            public void onSensorChangeValue(FmSensoEvent value) {
-                setValue(value.getInteger()+"");
-                setDecimal(value.getDecimal()+"");
+            public void onSensorChangeValue(FmSensoEvent value) {  
+               if(value.getOldInteger()!= value.getInteger())
+                    setValue(value.getInteger()+"");
+               if(value.getOldDecimal()!= value.getInteger())
+                    setDecimal(value.getDecimal()+"");
             }
         });
     } 

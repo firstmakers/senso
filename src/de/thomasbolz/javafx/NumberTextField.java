@@ -63,7 +63,7 @@ public class NumberTextField extends TextField {
         this.nf = nf;
         initHandlers();
         setNumber(value);
-        this.setAlignment(Pos.TOP_RIGHT);
+        //this.setAlignment(Pos.CENTER);
     }
 
     private void initHandlers() {

@@ -25,10 +25,13 @@ public class Light extends Sensor{
 
     @Override
     public void setValue(byte[] data) {
+        double old = value;
         double light = ((data[1] & 0xFF) << 8) + (data[0] & 0xFF);
         value = (light / 1.2);
+        if(old!= value){
          for(SensorListener l :listener)
-            l.onSensorChangeValue(new FmSensoEvent(getLux()));
+            l.onSensorChangeValue(new FmSensoEvent(getLux(),old));
+        }
     }
     public double getLux(){
         return round(value, 1);

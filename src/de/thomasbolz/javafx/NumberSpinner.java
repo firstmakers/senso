@@ -67,7 +67,6 @@ public class NumberSpinner extends HBox {
         // TextField
         numberField = new NumberTextField(value, nf);
         numberField.setId(NUMBER_FIELD);
-
         // Enable arrow keys for dec/inc
         numberField.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 

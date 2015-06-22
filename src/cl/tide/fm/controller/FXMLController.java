@@ -65,7 +65,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         deviceInfo = new DeviceInfo();
         control = new Control();
         control.samples.setNumber(new BigDecimal(300));
-        control.interval.setNumber(BigDecimal.ONE);
+        control.interval.setNumber(BigDecimal.ONE);      
         control.btnStart.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -253,9 +253,9 @@ public class FXMLController implements Initializable, FmSensoListener {
                     mChart.addSerie(view.getCustomSerie().getSerie());
                     Timeline fadein = new Timeline(
                             new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
-                            new KeyFrame(new Duration(300), new KeyValue(node.opacityProperty(), 1.0)));
-                    view.setSerieColor();
+                            new KeyFrame(new Duration(200), new KeyValue(node.opacityProperty(), 1.0)));
                     fadein.play();
+                    view.setSerieColor();
                 }
             }
         });

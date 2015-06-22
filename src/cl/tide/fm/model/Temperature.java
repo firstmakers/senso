@@ -55,7 +55,7 @@ public class Temperature extends Sensor{
         if(oldvalue != val){
             value = val;
             for(SensorListener l :listener)
-                l.onSensorChangeValue(new FmSensoEvent(value));
+                l.onSensorChangeValue(new FmSensoEvent(value,oldvalue));
         }
 
     }

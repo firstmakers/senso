@@ -10,7 +10,9 @@ import cl.tide.fm.model.Sensor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -106,8 +108,23 @@ public class SensorView extends VBox{
         if(node != null)
             node.setStyle("-fx-stroke: rgb("+rgb+", 1.0);");
     }
-    public void setValue(String value){
-        this.integer.setText(value.concat("."));
+    
+    public void setValue(String value) {
+        Timeline fade = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(integer.opacityProperty(), 1.0)),
+                new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        integer.setText(value.concat("."));
+                           Timeline fadein = new Timeline(
+                                new KeyFrame(Duration.ZERO, 
+                                        new KeyValue(integer.opacityProperty(), 0.0)), 
+                                new KeyFrame(new Duration(300), 
+                                        new KeyValue(integer.opacityProperty(), 1.0)));
+                        fadein.play();
+                    }
+                }, new KeyValue(integer.opacityProperty(), 0.0)));
+        fade.play();
     }
     
     public void setIcon(Image img){
@@ -130,7 +147,22 @@ public class SensorView extends VBox{
         this.ID = ID;
     }
     public void setDecimal(String t){
-        this.decimal.setText(t);
+            Timeline fade = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(decimal.opacityProperty(), 1.0)),
+                new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        decimal.setText(t);
+                        Timeline fadein = new Timeline(
+                                new KeyFrame(Duration.ZERO, 
+                                        new KeyValue(decimal.opacityProperty(), 0.0)), 
+                                new KeyFrame(new Duration(300), 
+                                        new KeyValue(decimal.opacityProperty(), 1.0)));
+                        fadein.play();
+                    }
+                }, new KeyValue(decimal.opacityProperty(), 0.0)));
+        fade.play();
+        
     }
     public void setUnit(String t){
         this.unit.setText(t);
