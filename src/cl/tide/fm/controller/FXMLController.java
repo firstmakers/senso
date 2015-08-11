@@ -147,8 +147,9 @@ public class FXMLController implements Initializable, FmSensoListener {
 
     @Override
     public void onStart() {
-        System.out.println("Start ");
-        mChart.start();
+        System.out.println("Start");
+        if(fmSenso.isRunning())
+            mChart.start();
         //mTab.startCapture();
     }
 

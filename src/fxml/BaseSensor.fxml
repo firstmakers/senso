@@ -19,16 +19,16 @@
             <Rectangle id="background" fx:id="background" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="65.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" style="-fx-arc-width: 10; -fx-arc-height: 10;" styleClass="background" width="275.0" />
             <ImageView id="icon" fx:id="icon" fitHeight="60.0" fitWidth="60.0" layoutX="6.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
             </ImageView>
-            <Text id="unit" fx:id="unit" fill="WHITE" layoutX="226.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ºC" textAlignment="RIGHT" wrappingWidth="32.5315055847168">
+            <Text id="unit" fx:id="unit" fill="WHITE" layoutX="226.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="unit" text="ºC" textAlignment="RIGHT" wrappingWidth="32.5315055847168">
                <font>
                   <Font size="14.0" />
                </font></Text>
-            <Text id="decimal" fx:id="decimal" fill="WHITE" layoutX="250.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="RIGHT">
+            <Text id="decimal" fx:id="decimal" fill="WHITE" layoutX="250.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0" textAlignment="RIGHT">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
-            <Text id="integer" fx:id="integer" fill="WHITE" layoutX="90.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0." textAlignment="RIGHT" wrappingWidth="158.85365676879883">
+            <Text id="integer" fx:id="integer" fill="WHITE" layoutX="90.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0." textAlignment="RIGHT" wrappingWidth="158.85365676879883">
                <font>
                   <Font size="36.0" />
                </font>

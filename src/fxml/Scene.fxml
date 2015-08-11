@@ -54,7 +54,7 @@
                   </TabPane>
                   <HBox alignment="TOP_RIGHT" layoutX="491.0" maxHeight="43.0" minHeight="43.0" prefHeight="43.0" prefWidth="149.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <ImageView fitHeight="36.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                        <ImageView fitHeight="36.0" pickOnBounds="true" preserveRatio="true" styleClass="logo" HBox.hgrow="ALWAYS">
                            <image>
                               <Image url="@../images/senso_small.png" />
                            </image>

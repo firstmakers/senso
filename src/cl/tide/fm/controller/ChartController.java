@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.scene.chart.*;
 
@@ -110,40 +111,46 @@ public class ChartController {
 
     public synchronized void plot() {
         timer.schedule(new TimerTask() {
+            @Override
             public void run() {
                 System.out.println("Total views " + views.size());
-                for (final SensorView view : views) {
+                views.stream().forEach((view) -> {
                     DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                     Date d = new Date();
                     String date = dateFormat.format(d);
                     Double data = view.getSensor().getValue();
                     final XYChart.Data<String, Double> value = new XYChart.Data<>(date, data);
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            if (view.getCustomSerie().getSerie().getData().size() > 50) {
-                                view.getCustomSerie().getSerie().getData().remove(0);
-                            }
-                            view.getCustomSerie().addValue(value);
+                    Platform.runLater(() -> {
+                        if (view.getCustomSerie().getSerie().getData().size() > 50) {
+                            view.getCustomSerie().getSerie().getData().remove(0);
                         }
+                        view.getCustomSerie().addValue(value);
                     });
-                }
-                for (final SensorView s : internalSensor) {
+                });
+                internalSensor.stream().forEach((SensorView s) -> {
                     DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                     Date d = new Date();
                     String date = dateFormat.format(d);
                     Double data = s.getSensor().getValue();
                     final XYChart.Data<String, Double> value = new XYChart.Data<>(date, data);
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            if (s.getCustomSerie().getSerie().getData().size() > 50) {
-                                s.getCustomSerie().getSerie().getData().remove(0);
-                            }
-                            s.getCustomSerie().addValue(value);
+                    Platform.runLater(() -> {
+                        if (s.getCustomSerie().getSerie().getData().size() > 50) {
+                            s.getCustomSerie().getSerie().getData().remove(0);
                         }
+                        s.getCustomSerie().addValue(value);
                     });
-                }
+                });
             }
         }, 5000, interval);
+    }
+    
+    public void clear(){
+        internalSensor.stream().forEach((s) -> {
+            s.getCustomSerie().getSerie().getData().clear();
+        });
+        views.stream().forEach((v) -> {
+            v.getCustomSerie().getSerie().getData().clear();
+        });
     }
 
     public ArrayList<SensorView> getInternalSensor() {

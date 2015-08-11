@@ -18,7 +18,7 @@ import org.hid4java.event.HidServicesEvent;
 
 /**
  *
- * @author eDelgado
+ * @author Edison Delgado
  */
 public abstract class FmDevice implements HidServicesListener {
 
@@ -125,26 +125,14 @@ public abstract class FmDevice implements HidServicesListener {
     }
 
     public void startReporter() {
-        /*reporter = new Reporter();
-         thread = new Thread(reporter);
-         thread.start();*/
         timer = new Timer();
         report();
     }
 
     public void stopReporter() {
-        /*if(thread!=null){            
-         try {               
-         reporter.terminate();
-         thread.join();
-         } catch (InterruptedException ex) {
-         Logger.getLogger(FmDevice.class.getName()).log(Level.INFO, ex.getMessage(), ex);
-         }
-         }*/
-        timer.cancel();
+        if(timer != null)
+            timer.cancel();
         timer = null;
-        /*thread = null;
-        reporter = null;*/
     }
 
     /*
@@ -153,13 +141,11 @@ public abstract class FmDevice implements HidServicesListener {
      *@param vid this is the vender ID (device)
      */
     public ArrayList<HidDevice> getCompatibleDevices(short pid, short vid) {
-        for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
-            if (hidDevice.getProductId() == pid
-                    && hidDevice.getVendorId() == vid) {
-                devices.add(hidDevice);
-            }
-        }
-        System.out.println(devices.size() + " device(s) found");
+        hidServices.getAttachedHidDevices().stream().filter((hidDevice) -> 
+                (hidDevice.getProductId() == pid && hidDevice.getVendorId() == vid))
+                .forEach((hidDevice) -> {
+                    devices.add(hidDevice);
+                });
         return this.devices;
     }
 
@@ -173,6 +159,7 @@ public abstract class FmDevice implements HidServicesListener {
 
     public void report() {
         timer.schedule(new TimerTask() {
+            @Override
             public void run() {
                 byte inBuffer[] = new byte[PACKET_LENGHT];
                 int val = currentDevice.read(inBuffer);

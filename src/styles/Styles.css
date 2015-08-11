@@ -11,13 +11,15 @@
     -fx-spacing: 8;
     -fx-padding: 0;
 }
-.background, .background-device, .tabPane, .chartContainer, .tabContainer{
-    /*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 6, 0, 0, 5);*/
+.background, .background-device, .tabPane, .chartContainer, .tabContainer, .value ,.unit, .btn {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 2, 0, 0, 2);
+}
+.logo,.icon, .chart-series-line{
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 1, 0, 0, 1);
 }
 
 .tabPane{
-    -fx-padding: 0;
-    
+    -fx-padding: 0;    
 }
 
 .tab-pane 
@@ -238,12 +240,15 @@
 .chart-plot-background {
     -fx-background-color: transparent;
 }
+.chart-series-line {    
+
+}
  
 .chart-vertical-grid-lines {
-    -fx-stroke: transparent;
+    -fx-stroke: lightgrey;
 }
 .chart-horizontal-grid-lines {
-    -fx-stroke: transparent;
+    -fx-stroke: lightgrey;
 }
 
 .check-box .box {

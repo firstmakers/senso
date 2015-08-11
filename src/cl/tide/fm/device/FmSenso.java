@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hid4java.*;
 
 
@@ -72,16 +74,13 @@ public class FmSenso extends FmDevice {
         
         //System.out.println("device is detached " + device + " listeners "+ mListener.size());
         synchronized(this){
-            for(FmSensoListener l : mListener)
-                l.onDetachedDevice(device);
+            mListener.stream().forEach((l) -> {l.onDetachedDevice(device);});
         }
         stop();      
     }
 
     @Override
     public void deviceAttached(HidDevice device) {
-         
-        //System.out.println("device is attached " + device);
         synchronized (this) {
             for (FmSensoListener l : mListener) {
                 l.onAttachedDevice(device);
@@ -89,7 +88,8 @@ public class FmSenso extends FmDevice {
         }
     }
     
-    public void start() {
+    
+public void start() {
         if (currentDevice.open()) {
             startReporter();
             /*writer = new Writer();
@@ -97,11 +97,11 @@ public class FmSenso extends FmDevice {
             thread.start();*/
             writer = new Timer();
             write();
+            running = true;
             synchronized (this) {
                 for (FmSensoListener l : mListener) {
-                    l.onStart();
+                    l.onStart();   
                 }
-                running = true;
             }
         }
     }
@@ -112,15 +112,15 @@ public class FmSenso extends FmDevice {
         switch(data[0]){
             case Commands.EXTERNAL_SENSORS:
                 processExternalSensor(data);
-                //System.out.println("MEDICION EXTERNA "+Arrays.toString(data));
+                System.out.println("MEDICION EXTERNA "+Arrays.toString(data));
                 break;
             case Commands.INTERNAL_SENSORS:
                 processInternalSensor(data);
-                //System.out.println("MEDICION INTERNA"+Arrays.toString(data));
+                System.out.println("MEDICION INTERNA"+Arrays.toString(data));
                 break;
             default:
                 ExternalSensorStatus(data);
-                //System.out.println("REPORTE DE SENSORES CONECTADOS "+Arrays.toString(data));
+                System.out.println("REPORTE DE SENSORES CONECTADOS "+Arrays.toString(data));
         }         
     }
 
@@ -147,15 +147,13 @@ public class FmSenso extends FmDevice {
         if (oldCount > count) {
             List<Sensor> removed = sensorManager.getDetachedSensor(data);
             synchronized(this){
-                for(FmSensoListener l : mListener)
-                    l.onSensorDetach(new ArrayList<>(removed));
+                mListener.stream().forEach((l) -> {l.onSensorDetach(new ArrayList<>(removed));});
             }
             sensorManager.removeSensor(removed);
         } else{
             List<Sensor> added = sensorManager.getAttachedSensor(data);
             synchronized(this){
-                for(FmSensoListener l : mListener)
-                    l.onSensorAttach(new ArrayList<>(added));
+                mListener.stream().forEach((l) -> {l.onSensorAttach(new ArrayList<>(added));});
             }
             sensorManager.addSensor(added);
         } 
@@ -163,24 +161,16 @@ public class FmSenso extends FmDevice {
    
 
     public void stop() {
-        running = false;
-        /*
-         writer.terminate();
-          
-         thread.join();
-         writer = null;
-         thread = null;*/
-        writer.cancel();
-        synchronized (this) {
-            for (FmSensoListener l : mListener) {
-                l.onClose();
+        if (running) {
+            running = false;
+            writer.cancel();
+            synchronized (this) {
+                mListener.stream().forEach((l) -> {l.onClose();});
             }
+            stopReporter();
+            sensorManager.clear();
+            writer = null;
         }
-
-        stopReporter();
-        sensorManager.clear();
-        writer = null;
-
     }
     
     private void processExternalSensor(byte[] data) {
@@ -216,8 +206,13 @@ public class FmSenso extends FmDevice {
         writer.schedule(new TimerTask() {
             @Override
             public void run() {
-                writeCommand(Commands.EXTERNAL_SENSORS);
-                writeCommand(Commands.INTERNAL_SENSORS);
+                try {
+                    writeCommand(Commands.INTERNAL_SENSORS);
+                    Thread.sleep(300);              
+                    writeCommand(Commands.EXTERNAL_SENSORS);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(FmSenso.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }, 0, interval);
     }
