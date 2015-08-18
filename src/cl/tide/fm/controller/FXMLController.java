@@ -254,7 +254,7 @@ public class FXMLController implements Initializable, FmSensoListener {
                     mChart.addSerie(view.getCustomSerie().getSerie());
                     Timeline fadein = new Timeline(
                             new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
-                            new KeyFrame(new Duration(200), new KeyValue(node.opacityProperty(), 1.0)));
+                            new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
                     fadein.play();
                     view.setSerieColor();
                 }
@@ -271,7 +271,7 @@ public class FXMLController implements Initializable, FmSensoListener {
                     mChart.removeSerie(view.getCustomSerie().getSerie());
                     Timeline fade = new Timeline(
                             new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
-                            new KeyFrame(new Duration(600), new EventHandler<ActionEvent>() {
+                            new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
                             sensorContainer.getChildren().remove(node);

@@ -36,7 +36,7 @@ public class FmSenso extends FmDevice {
         sensorManager = new SensorManager();
         setProductID(productID);
         setVendorID(vendorID);   
-        setInterval(2000);
+        setInterval(1000);
         initialize();
     }
 
@@ -208,7 +208,7 @@ public void start() {
             public void run() {
                 try {
                     writeCommand(Commands.INTERNAL_SENSORS);
-                    Thread.sleep(300);              
+                    Thread.sleep(500);              
                     writeCommand(Commands.EXTERNAL_SENSORS);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(FmSenso.class.getName()).log(Level.SEVERE, null, ex);

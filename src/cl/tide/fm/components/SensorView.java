@@ -53,6 +53,7 @@ public class SensorView extends VBox{
     private Sensor sensor;
     private List<ViewChanged> listener;
     private boolean serieVisibility;
+    private boolean animation;
 
     /**
      *
@@ -82,8 +83,7 @@ public class SensorView extends VBox{
        cbx.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue){
-                 //System.out.println("oldvalue " +oldValue+" newValue "+ newValue); 
-            
+                 //System.out.println("oldvalue " +oldValue+" newValue "+ newValue);            
                 for(ViewChanged list : listener){
                     list.changed(serieVisibility, customSerie, newValue);
                      if(newValue)
@@ -91,6 +91,7 @@ public class SensorView extends VBox{
                 }            
             }          
         });
+       animation = false;
     }
     
     public void addListener(ViewChanged listener){
@@ -110,21 +111,25 @@ public class SensorView extends VBox{
     }
     
     public void setValue(String value) {
+        if(animation){
         Timeline fade = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(integer.opacityProperty(), 1.0)),
-                new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
+                new KeyFrame(new Duration(100), new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         integer.setText(value.concat("."));
                            Timeline fadein = new Timeline(
                                 new KeyFrame(Duration.ZERO, 
                                         new KeyValue(integer.opacityProperty(), 0.0)), 
-                                new KeyFrame(new Duration(300), 
+                                new KeyFrame(new Duration(100), 
                                         new KeyValue(integer.opacityProperty(), 1.0)));
                         fadein.play();
                     }
                 }, new KeyValue(integer.opacityProperty(), 0.0)));
         fade.play();
+        }else{
+            integer.setText(value.concat("."));
+        }
     }
     
     public void setIcon(Image img){
@@ -147,22 +152,25 @@ public class SensorView extends VBox{
         this.ID = ID;
     }
     public void setDecimal(String t){
+        if(animation){
             Timeline fade = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(decimal.opacityProperty(), 1.0)),
-                new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
+                new KeyFrame(new Duration(100), new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         decimal.setText(t);
                         Timeline fadein = new Timeline(
                                 new KeyFrame(Duration.ZERO, 
                                         new KeyValue(decimal.opacityProperty(), 0.0)), 
-                                new KeyFrame(new Duration(300), 
+                                new KeyFrame(new Duration(100), 
                                         new KeyValue(decimal.opacityProperty(), 1.0)));
                         fadein.play();
                     }
                 }, new KeyValue(decimal.opacityProperty(), 0.0)));
-        fade.play();
-        
+        fade.play();  
+        }else{
+            decimal.setText(t);
+        }
     }
     public void setUnit(String t){
         this.unit.setText(t);

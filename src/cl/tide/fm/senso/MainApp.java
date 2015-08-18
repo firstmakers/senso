@@ -1,6 +1,8 @@
 package cl.tide.fm.senso;
 
 import cl.tide.fm.controller.FXMLController;
+import com.sun.javafx.PlatformUtil;
+import de.codecentric.centerdevice.platform.osx.NSMenuBarAdapter;
 import java.net.URL;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -8,6 +10,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -34,6 +40,15 @@ public class MainApp extends Application {
         stage.setMinWidth(960.0);
         stage.setMinHeight(640.0);
         stage.show();
+        //tweak menu mac
+        if(PlatformUtil.isMac()){
+            NSMenuBarAdapter creator = new NSMenuBarAdapter();
+		creator.renameMenuItem(0, 0, "Ocultar Senso");
+                creator.renameMenuItem(0, 1, "Ocultar otros");
+                creator.renameMenuItem(0, 2, "Mostar todos");
+		creator.renameMenuItem(0, -1, "Salir de Senso");
+		creator.renameApplicationMenu("Senso");
+        }
  
     }
 

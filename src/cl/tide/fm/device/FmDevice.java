@@ -87,16 +87,19 @@ public abstract class FmDevice implements HidServicesListener {
 
     public int write(byte command) {
         byte[] data;
-        if(PlatformUtil.isWindows()){
-            data = new byte[PACKET_LENGHT];
-            data[0] = REPORT_ID;
-            data[1]= command;
+        if (connected) {
+            if (PlatformUtil.isWindows()) {
+                data = new byte[PACKET_LENGHT];
+                data[0] = REPORT_ID;
+                data[1] = command;
+            } else {
+                data = new byte[PACKET_LENGHT];
+                data[0] = command;
+            }
+            return currentDevice.write(data, PACKET_LENGHT, REPORT_ID);
+        } else {
+            return 0;
         }
-        else{
-            data = new byte[PACKET_LENGHT];
-            data[0] = command;
-        }              
-        return currentDevice.write(data, PACKET_LENGHT, REPORT_ID);
     }
 
     protected void reportData(byte[] data) {
