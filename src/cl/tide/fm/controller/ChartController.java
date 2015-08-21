@@ -6,15 +6,24 @@
 package cl.tide.fm.controller;
 
 import cl.tide.fm.components.*;
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.weathericons.WeatherIcon;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Consumer;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.chart.*;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -23,11 +32,13 @@ import javafx.scene.chart.*;
 public class ChartController {
 
     private LineChart lChart;
-    private ArrayList<SensorView> views;
+    private ArrayList<SensorView> externalSensor;
     private long interval;
     private Timer timer;
     private boolean running = false;
     private ArrayList<SensorView> internalSensor;
+    private ContextMenu cMenu;
+
 
     ///Constructor
     public ChartController(LineChart chart) {
@@ -40,9 +51,94 @@ public class ChartController {
         //lChart.setLegendSide(Side.TOP);
         //lChart.getXAxis().setAutoRanging(false);
         lChart.getXAxis().setAutoRanging(true);
-        lChart.getXAxis().setTickMarkVisible(false);      
+        lChart.getXAxis().setTickMarkVisible(false);
         lChart.setAnimated(false);
+        cMenu = setContextMenu();
 
+        lChart.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (MouseButton.SECONDARY.equals(event.getButton())) {
+                    cMenu.show(lChart.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+                }
+            }
+        });
+
+    }
+
+    private ContextMenu setContextMenu() {
+
+        MenuItem clearChart = new MenuItem("Borrar gráfico");
+        //GlyphsDude.setIcon(clearChart, FontAwesomeIcon.TRASH, "1.5em");
+        MenuItem chartManager = new MenuItem("Detener gráfico");
+        //GlyphsDude.setIcon(chartManager, FontAwesomeIcon.STOP, "1.5em");
+        
+        CheckMenuItem fastUpdate = new CheckMenuItem("Graficar cada 1 segundo");
+        CheckMenuItem normalUpdate = new CheckMenuItem("Graficar cada 5 segundos");
+        CheckMenuItem slowUpdate = new CheckMenuItem("Graficar cada 10 segundos");
+        normalUpdate.setSelected(true);
+        clearChart.setOnAction(e -> {
+
+            internalSensor.stream().forEach((SensorView internal) -> {
+                internal.getCustomSerie().getSerie().getData().clear();          
+            });
+            externalSensor.stream().forEach((SensorView external) -> {
+                external.getCustomSerie().getSerie().getData().clear();
+            });           
+        });
+        
+        chartManager.setOnAction(e ->{
+            if(isRunning()){
+                stop();
+                chartManager.setText("Iniciar gráfico");
+                //GlyphsDude.setIcon(chartManager, FontAwesomeIcon.PLAY, "1.5em");
+            }
+            else{
+                start();
+                chartManager.setText("Detener gráfico");
+                //GlyphsDude.setIcon(chartManager, FontAwesomeIcon.STOP, "1.5em");
+            }
+        });
+
+        fastUpdate.setOnAction(e -> {
+            if (fastUpdate.isSelected()) {
+                stop();
+                slowUpdate.setSelected(false);
+                normalUpdate.setSelected(false);
+                setInterval(1000);
+                start();              
+            }
+        });
+        normalUpdate.setOnAction(e-> {
+            if(normalUpdate.isSelected()){
+                stop();
+                slowUpdate.setSelected(false);
+                fastUpdate.setSelected(false);
+                setInterval(5000);
+                start();
+            }
+        });
+
+        slowUpdate.setOnAction(e -> {
+            if (slowUpdate.isSelected()) {
+                stop();
+                fastUpdate.setSelected(false);
+                normalUpdate.setSelected(false);
+                setInterval(10000);
+                start();
+            }
+        });
+        
+        ContextMenu menu = new ContextMenu(
+                chartManager,
+                clearChart,
+                new SeparatorMenuItem(),
+                fastUpdate,
+                normalUpdate,
+                slowUpdate
+        );
+        
+        return menu;
     }
 
     public void start() {
@@ -74,7 +170,7 @@ public class ChartController {
     }
 
     public int getViewCount() {
-        return views.size();
+        return externalSensor.size();
     }
 
     public long getInterval() {
@@ -94,11 +190,11 @@ public class ChartController {
     }
 
     public ArrayList<SensorView> getViews() {
-        return views;
+        return externalSensor;
     }
 
     public void setExternalSensors(ArrayList<SensorView> views) {
-        this.views = views;
+        this.externalSensor = views;
     }
 
     public boolean isRunning() {
@@ -113,11 +209,11 @@ public class ChartController {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("Total views " + views.size());
-                views.stream().forEach((view) -> {
-                    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                    Date d = new Date();
-                    String date = dateFormat.format(d);
+                System.out.println("Total views " + externalSensor.size());
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                Date d = new Date();
+                String date = dateFormat.format(d);
+                externalSensor.stream().forEach((view) -> {                 
                     Double data = view.getSensor().getValue();
                     final XYChart.Data<String, Double> value = new XYChart.Data<>(date, data);
                     Platform.runLater(() -> {
@@ -128,9 +224,6 @@ public class ChartController {
                     });
                 });
                 internalSensor.stream().forEach((SensorView s) -> {
-                    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                    Date d = new Date();
-                    String date = dateFormat.format(d);
                     Double data = s.getSensor().getValue();
                     final XYChart.Data<String, Double> value = new XYChart.Data<>(date, data);
                     Platform.runLater(() -> {
@@ -141,14 +234,14 @@ public class ChartController {
                     });
                 });
             }
-        }, 5000, interval);
+        }, 1000, interval);
     }
     
     public void clear(){
         internalSensor.stream().forEach((s) -> {
             s.getCustomSerie().getSerie().getData().clear();
         });
-        views.stream().forEach((v) -> {
+        externalSensor.stream().forEach((v) -> {
             v.getCustomSerie().getSerie().getData().clear();
         });
     }

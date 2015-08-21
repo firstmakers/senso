@@ -80,16 +80,13 @@ public class SensorView extends VBox{
        listener = new ArrayList<>();
        cbx.setSelected(true);
        serieVisibility = true;
-       cbx.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue){
-                 //System.out.println("oldvalue " +oldValue+" newValue "+ newValue);            
-                for(ViewChanged list : listener){
-                    list.changed(serieVisibility, customSerie, newValue);
-                     if(newValue)
-                        setSerieColor();
-                }            
-            }          
+       cbx.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+           //System.out.println("oldvalue " +oldValue+" newValue "+ newValue);
+           for(ViewChanged list : listener){
+               list.changed(serieVisibility, customSerie, newValue);
+               if(newValue)
+                   setSerieColor();
+           }          
         });
        animation = false;
     }
