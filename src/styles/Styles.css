@@ -8,8 +8,6 @@
 }
 .sensorContainer{
     
-    -fx-spacing: 8;
-    -fx-padding: 0;
 }
 .background, .background-device, .tabPane, .chartContainer, .tabContainer, .value ,.unit, .btn {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 2, 0, 0, 2);

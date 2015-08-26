@@ -34,6 +34,8 @@ public abstract class FmDevice implements HidServicesListener {
     private boolean connected = false;
     Timer timer;
 
+    protected String version = "";
+
     public FmDevice() throws HidException {
         hidServices = HidManager.getHidServices();
         hidServices.addHidServicesListener(this);
@@ -158,6 +160,14 @@ public abstract class FmDevice implements HidServicesListener {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public void report() {

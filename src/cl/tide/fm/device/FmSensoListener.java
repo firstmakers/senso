@@ -15,7 +15,7 @@ import org.hid4java.HidDevice;
  */
 public interface FmSensoListener {
     
-
+    public void onFirmwareChange(String firm);
     public void onAttachedDevice(HidDevice device);
     public void onDetachedDevice(HidDevice device);
     public void onClose();

@@ -64,11 +64,7 @@ public class SensorManager {
     }
     
     public boolean findSensorByID(String id){      
-              for(Sensor s: externalSensors){
-                if(s.getId().equals(id))
-                    return true;
-            }
-        return false;      
+        return externalSensors.stream().anyMatch((s) -> (s.getId().equals(id)));      
     }
     
     public Sensor getSensorByID(String id){
@@ -144,9 +140,9 @@ public class SensorManager {
                 removedSensor.remove(sensor);
             }
         }   
-        for (Sensor k : removedSensor) {
+        removedSensor.stream().forEach((k) -> {
             System.out.println(" New Sensor detached "+ k.getId());
-        }
+        });
         return removedSensor;
     }
 

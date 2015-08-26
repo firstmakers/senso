@@ -6,9 +6,6 @@
 package cl.tide.fm.controller;
 
 import cl.tide.fm.components.*;
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.weathericons.WeatherIcon;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.chart.*;
 import javafx.scene.control.CheckMenuItem;
@@ -55,12 +53,9 @@ public class ChartController {
         lChart.setAnimated(false);
         cMenu = setContextMenu();
 
-        lChart.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (MouseButton.SECONDARY.equals(event.getButton())) {
-                    cMenu.show(lChart.getScene().getWindow(), event.getScreenX(), event.getScreenY());
-                }
+        lChart.setOnMouseClicked((MouseEvent event) -> {
+            if (MouseButton.SECONDARY.equals(event.getButton())) {
+                cMenu.show(lChart.getScene().getWindow(), event.getScreenX(), event.getScreenY());
             }
         });
 
@@ -78,13 +73,7 @@ public class ChartController {
         CheckMenuItem slowUpdate = new CheckMenuItem("Graficar cada 10 segundos");
         normalUpdate.setSelected(true);
         clearChart.setOnAction(e -> {
-
-            internalSensor.stream().forEach((SensorView internal) -> {
-                internal.getCustomSerie().getSerie().getData().clear();          
-            });
-            externalSensor.stream().forEach((SensorView external) -> {
-                external.getCustomSerie().getSerie().getData().clear();
-            });           
+            clear();           
         });
         
         chartManager.setOnAction(e ->{
@@ -136,8 +125,7 @@ public class ChartController {
                 fastUpdate,
                 normalUpdate,
                 slowUpdate
-        );
-        
+        );      
         return menu;
     }
 
@@ -234,7 +222,7 @@ public class ChartController {
                     });
                 });
             }
-        }, 1000, interval);
+        }, 3000, interval);
     }
     
     public void clear(){

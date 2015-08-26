@@ -45,7 +45,7 @@ public class MainApp extends Application {
 		creator.renameMenuItem(0, -1, "Salir de Senso");
 		creator.renameApplicationMenu("Senso");
         }
- 
+        
     }
 
     @Override

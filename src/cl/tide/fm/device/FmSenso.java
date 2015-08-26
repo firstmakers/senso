@@ -71,8 +71,6 @@ public class FmSenso extends FmDevice {
       
     @Override
     public void deviceDetached(HidDevice device){
-        
-        //System.out.println("device is detached " + device + " listeners "+ mListener.size());
         synchronized(this){
             mListener.stream().forEach((l) -> {l.onDetachedDevice(device);});
         }
@@ -82,9 +80,9 @@ public class FmSenso extends FmDevice {
     @Override
     public void deviceAttached(HidDevice device) {
         synchronized (this) {
-            for (FmSensoListener l : mListener) {
+            mListener.stream().forEach((l) -> {
                 l.onAttachedDevice(device);
-            }
+            });
         }
     }
     
@@ -98,6 +96,7 @@ public void start() {
             writer = new Timer();
             write();
             running = true;
+            writeCommand(Commands.FIRMWARE);
             synchronized (this) {
                 for (FmSensoListener l : mListener) {
                     l.onStart();   
@@ -118,6 +117,8 @@ public void start() {
                 processInternalSensor(data);
                 System.out.println("MEDICION INTERNA"+Arrays.toString(data));
                 break;
+            case Commands.FIRMWARE:
+                setFirmware(data);
             default:
                 ExternalSensorStatus(data);
                 System.out.println("REPORTE DE SENSORES CONECTADOS "+Arrays.toString(data));
@@ -125,10 +126,7 @@ public void start() {
     }
 
     public int writeCommand(byte command) {
-        int value = super.write(command);
-        //if(value > 0) //System.out.println("Success " + value);
-            //success write
-        return value;
+        return super.write(command);
     }
     
     /*
@@ -203,8 +201,8 @@ public void start() {
     }
     
     private void write() {
-        writer.schedule(new TimerTask() {
-            @Override
+        writer.schedule(new TimerTask() {          
+            @Override          
             public void run() {
                 try {
                     writeCommand(Commands.INTERNAL_SENSORS);
@@ -214,7 +212,7 @@ public void start() {
                     Logger.getLogger(FmSenso.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }, 0, interval);
+        }, 300, interval);
     }
 
     private void processInternalSensor(byte[] data) {
@@ -244,6 +242,18 @@ public void start() {
             }
         }
     }*/
+
+    private void setFirmware(byte[] data) {
+        StringBuilder b = new StringBuilder();
+       
+        b.append(data[1]);
+        b.append(".");
+        b.append(data[2]);
+        setVersion(b.toString());
+        mListener.forEach((l)->{
+            l.onFirmwareChange(b.toString());
+        });
+    }
 }
 
 

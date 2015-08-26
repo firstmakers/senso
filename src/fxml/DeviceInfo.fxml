@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
@@ -13,7 +14,7 @@
    <children>
       <AnchorPane>
          <children>
-            <Rectangle id="background" arcHeight="5.0" arcWidth="5.0" fill="#635e98" height="75.0" style="-fx-arc-height: 10; -fx-arc-width: 10;" styleClass="background-device" width="275.0" />
+            <Rectangle id="background" arcHeight="5.0" arcWidth="5.0" fill="#0090ce" height="75.0" style="-fx-arc-height: 10; -fx-arc-width: 10;" styleClass="background-device" width="275.0" />
             <ImageView id="icon" fx:id="icon" fitHeight="66.0" fitWidth="85.0" layoutX="207.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/usb_attach.png" />

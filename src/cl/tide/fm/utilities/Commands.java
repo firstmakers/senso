@@ -11,7 +11,7 @@ package cl.tide.fm.utilities;
  */
 public class Commands {
     
-    public static final byte FIRMWARE = (byte) 0x88;
+    public static final byte FIRMWARE = (byte) 0x81;
     public static final byte EXTERNAL_SENSORS = (byte) 0x83;
     public static final byte INTERNAL_SENSORS = (byte) 0x84;
 }

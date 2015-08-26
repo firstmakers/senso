@@ -20,7 +20,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -29,7 +28,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -40,17 +41,16 @@ import org.hid4java.HidException;
 public class FXMLController implements Initializable, FmSensoListener {
 
     FmSenso fmSenso;
-    @FXML
-    Node AnchorPane;
-    @FXML
-    private VBox sensorContainer;
+    @FXML Node AnchorPane;
+    @FXML private VBox sensorContainer;
+    @FXML private LineChart lineChart;
+    @FXML private ImageView status, logo; 
+    @FXML private Text firmware;
     private ArrayList<SensorView> ExternalSensorView;
     private ArrayList<SensorView> InternalSensorView;
     private DeviceInfo deviceInfo;
     private Control control;
-    @FXML
-    private LineChart lineChart;
-    //@FXML private TableView tableView; 
+    
     private ChartController mChart;
     //private TableViewController mTab;
     private Timer mTimer;
@@ -61,34 +61,22 @@ public class FXMLController implements Initializable, FmSensoListener {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        deviceInfo = new DeviceInfo();
+       
+        //deviceInfo = new DeviceInfo();
         control = new Control();
         control.samples.setNumber(new BigDecimal(300));
         control.interval.setNumber(BigDecimal.ONE);      
-        control.btnStart.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickStart();
-            }
+        control.btnStart.setOnAction((ActionEvent event) -> {
+            clickStart();
         });
-        control.btnPause.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickPause();
-            }
+        control.btnPause.setOnAction((ActionEvent event) -> {
+            clickPause();
         });
-        control.btnStop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickStop();
-            }
+        control.btnStop.setOnAction((ActionEvent event) -> {
+            clickStop();
         });
-        control.btnSave.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickSave(((Node) event.getTarget()).getScene().getWindow());
-            }
+        control.btnSave.setOnAction((ActionEvent event) -> {
+            clickSave(((Node) event.getTarget()).getScene().getWindow());
         });
         try {
             fmSenso = new FmSenso();
@@ -98,9 +86,9 @@ public class FXMLController implements Initializable, FmSensoListener {
 
         } catch (HidException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-        }
-        //sensorContainer.getChildren().add(deviceInfo);
+        }      
         sensorContainer.getChildren().add(control);
+        //sensorContainer.getChildren().add(deviceInfo);
 
         mChart = new ChartController(lineChart);
         mChart.setExternalSensors(ExternalSensorView);
@@ -115,7 +103,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             addInternalSensor();
         }
         setStatusDevice(fmSenso.getCurrentDevice());
-        fm = new FileManager(ExternalSensorView);
+        fm = new FileManager(ExternalSensorView);   
     }
     /*
      *Agrega los sensores internos de la tarjeta senso
@@ -142,14 +130,17 @@ public class FXMLController implements Initializable, FmSensoListener {
         System.out.println("Closed");
         mChart.stop();
         clickStop();
+        firmware.setText("");
         //mTab.stopCapture();
     }
 
     @Override
     public void onStart() {
         System.out.println("Start");
-        if(fmSenso.isRunning())
+        if(fmSenso.isRunning()){
             mChart.start();
+            fmSenso.addFmSensoListener(this);
+        }
         //mTab.startCapture();
     }
 
@@ -166,29 +157,26 @@ public class FXMLController implements Initializable, FmSensoListener {
     @Override
     public void onDetachedDevice(HidDevice device) {
         setStatusDevice(device);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                sensorContainer.getChildren().removeAll(ExternalSensorView);
-                sensorContainer.getChildren().removeAll(InternalSensorView);
-                ExternalSensorView.clear();
-                InternalSensorView.clear();
-                System.out.println("Current device Detached ");
-            }
+        Platform.runLater(() -> {
+            mChart.clear();
+            sensorContainer.getChildren().removeAll(ExternalSensorView);
+            sensorContainer.getChildren().removeAll(InternalSensorView);
+            ExternalSensorView.clear();
+            InternalSensorView.clear();
+            System.out.println("Current device Detached ");
         });
     }
 
     public void setStatusDevice(HidDevice device) {
         if (device != null) {
-            deviceInfo.setName(device.getProduct());
-            deviceInfo.setFirmware(device.getManufacturer());
+            status.setImage(new Image("/images/usb_detach.png"));
         }
         if (fmSenso.isConnected()) {
-            deviceInfo.setIcon(new Image("/images/usb_attach.png"));
-            deviceInfo.setStatus("Conectado");
+            status.setImage(new Image("/images/usb_attach.png"));
+            //deviceInfo.setStatus("Conectado");
         } else {
-            deviceInfo.setIcon(new Image("/images/usb_detach.png"));
-            deviceInfo.setStatus("Desconectado");
+            status.setImage(new Image("/images/usb_detach.png"));
+            //deviceInfo.setStatus("Desconectado");
         }
     }
 
@@ -239,46 +227,36 @@ public class FXMLController implements Initializable, FmSensoListener {
     }
 
     private void addView(final Node node) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                final SensorView view = (SensorView) node;
-                view.addListener(new ViewChanged() {
-                    @Override
-                    public void changed(boolean visible, CustomSeries customSerie, Boolean status) {
-                        setChanges(view, status);
-                    }
-                });
-                synchronized (FXMLController.this) {
-                    sensorContainer.getChildren().add(node);
-                    mChart.addSerie(view.getCustomSerie().getSerie());
-                    Timeline fadein = new Timeline(
-                            new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
-                            new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
-                    fadein.play();
-                    view.setSerieColor();
-                }
+        Platform.runLater(() -> {
+            final SensorView view = (SensorView) node;
+            view.addListener((boolean visible, CustomSeries customSerie, Boolean status) -> {
+                setChanges(view, status);
+            });
+           
+            synchronized (FXMLController.this) {
+               
+                sensorContainer.getChildren().add(node);
+                mChart.addSerie(view.getCustomSerie().getSerie());
+                Timeline fadein = new Timeline(
+                        new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
+                        new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
+                fadein.play();
+                view.setSerieColor();
             }
         });
     }
 
     private void removeView(final Node node) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                SensorView view = (SensorView) node;
-                synchronized (FXMLController.this) {
-                    mChart.removeSerie(view.getCustomSerie().getSerie());
-                    Timeline fade = new Timeline(
-                            new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
-                            new KeyFrame(new Duration(200), new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
+        Platform.runLater(() -> {
+            SensorView view = (SensorView) node;
+            synchronized (FXMLController.this) {
+                mChart.removeSerie(view.getCustomSerie().getSerie());
+                Timeline fade = new Timeline(
+                        new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
+                        new KeyFrame(new Duration(200), e -> {
                             sensorContainer.getChildren().remove(node);
-                        }
-                    }, new KeyValue(node.opacityProperty(), 0.0)));
-                    fade.play();               
-                }
+                        }, new KeyValue(node.opacityProperty(), 0.0)));
+                fade.play();
             }
         });
     }
@@ -317,7 +295,7 @@ public class FXMLController implements Initializable, FmSensoListener {
 
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Senso");
-        alert.setHeaderText("Atención, hay una medición disponible");
+        alert.setHeaderText("Atención, hay datos de una medición disponible");
         alert.setContentText("¿Desea guardar?");
         
         Optional<ButtonType> result = alert.showAndWait();
@@ -363,14 +341,11 @@ public class FXMLController implements Initializable, FmSensoListener {
 
     private void updateUI() {
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                double n = control.samples.getNumber().intValue();
-                // System.out.println("updating ui "+totalSamples+"/"+n  +(totalSamples/n)+ " %");
-                control.sampleText.setText(totalSamples + "/" + (int) n);
-                control.progressBar.setProgress(totalSamples / n);
-            }
+        Platform.runLater(() -> {
+            double n = control.samples.getNumber().intValue();
+            // System.out.println("updating ui "+totalSamples+"/"+n  +(totalSamples/n)+ " %");
+            control.sampleText.setText(totalSamples + "/" + (int) n);
+            control.progressBar.setProgress(totalSamples / n);
         });
     }
 
@@ -416,13 +391,17 @@ public class FXMLController implements Initializable, FmSensoListener {
 
     private void clear() {
         totalSamples = 0;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                control.sampleText.setText("0/0");
-                control.progressBar.setProgress(0.0);
-            }
+        Platform.runLater(() -> {
+            control.sampleText.setText("0/0");
+            control.progressBar.setProgress(0.0);
         });
+    }
+
+    @Override
+    public void onFirmwareChange(String firm) {
+        Platform.runLater(()->{
+            firmware.setText("versión: "+firm);
+        });   
     }
 
 }
