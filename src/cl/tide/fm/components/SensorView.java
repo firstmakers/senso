@@ -10,13 +10,10 @@ import cl.tide.fm.model.Sensor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
+import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -29,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -38,14 +36,14 @@ import javafx.util.Duration;
  */
 public class SensorView extends VBox{
     
-    @FXML private Text decimal;
-    @FXML private Text integer;
-    @FXML private TextField name;
-    @FXML private Text unit;
-    @FXML private CheckBox cbx;
-    @FXML private ImageView icon;
+    @FXML public Text decimal;
+    @FXML public Text integer;
+    @FXML public TextField name;
+    @FXML public Text unit;
+    @FXML public CheckBox cbx;
+    @FXML public ImageView icon;
     @FXML private Rectangle background;
-    @FXML private ColorPicker colorPicker;
+    @FXML public ColorPicker colorPicker;
     private FXMLLoader fxmlLoader;
     private String ID;
     private Color color;
@@ -69,13 +67,13 @@ public class SensorView extends VBox{
             throw new RuntimeException(exception);
         }
         
-       colorPicker.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                setColor(colorPicker.getValue());
-                setBackgroundColor(getColor());
-                setSerieColor();
-            }
+       colorPicker.setOnAction((ActionEvent event) -> {
+           Color oldColor = getColor();
+           setColor(colorPicker.getValue());
+           Color newColor = getColor();
+           animateBackground(background, oldColor, newColor);
+           setBackgroundColor(newColor);
+           setSerieColor();
         });
        listener = new ArrayList<>();
        cbx.setSelected(true);
@@ -88,7 +86,29 @@ public class SensorView extends VBox{
                    setSerieColor();
            }          
         });
-       animation = false;
+       animation = true;
+    }
+    
+    /*
+    * Anima el color de una figura, se utiliza para animar el 
+    * fondo de los sensores cuando cambian de color.
+    * @param shape: figura que se animará.
+    * @param from: color actual
+    * @param to : próximo color.
+     */
+    private void animateBackground(Shape shape, Color from, Color to ){
+        FillTransition ft = new FillTransition(new Duration(400));
+        ft.setShape(shape);
+        ft.setFromValue(from);
+        ft.setToValue(to);
+        ft.play();
+    }
+    public void animateText(Text text ,double from, double to){
+        FadeTransition ft = new FadeTransition(new Duration(400));
+        ft.setNode(text);
+        ft.setFromValue(from);
+        ft.setToValue(to);
+        ft.play(); 
     }
     
     public void addListener(ViewChanged listener){
@@ -96,34 +116,30 @@ public class SensorView extends VBox{
             this.listener.add(listener);
     }
     
+    /*
+    * Aplica el color actual del sensor a la serie del gráfico
+    */
     public void setSerieColor(){
         String rgb = String.format("%d, %d, %d",
         (int) (color.getRed() * 255),
         (int) (color.getGreen() * 255),
         (int) (color.getBlue() * 255));
-        
+        try{
         Node node = getCustomSerie().getSerie().getNode();
         if(node != null)
             node.setStyle("-fx-stroke: rgb("+rgb+", 1.0);");
+        }catch(Exception e){
+            System.out.println("exception "+ e.getMessage());
+        }
     }
     
     public void setValue(String value) {
-        if(animation){
-        Timeline fade = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(integer.opacityProperty(), 1.0)),
-                new KeyFrame(new Duration(100), new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        integer.setText(value.concat("."));
-                           Timeline fadein = new Timeline(
-                                new KeyFrame(Duration.ZERO, 
-                                        new KeyValue(integer.opacityProperty(), 0.0)), 
-                                new KeyFrame(new Duration(100), 
-                                        new KeyValue(integer.opacityProperty(), 1.0)));
-                        fadein.play();
-                    }
-                }, new KeyValue(integer.opacityProperty(), 0.0)));
-        fade.play();
+        if(animation){   
+            //animateText(integer, 1.0, 0.0);
+            integer.setText(value.concat("."));
+            animateText(integer, 0.0, 1.0);
+            
+            
         }else{
             integer.setText(value.concat("."));
         }
@@ -149,22 +165,10 @@ public class SensorView extends VBox{
         this.ID = ID;
     }
     public void setDecimal(String t){
-        if(animation){
-            Timeline fade = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(decimal.opacityProperty(), 1.0)),
-                new KeyFrame(new Duration(100), new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        decimal.setText(t);
-                        Timeline fadein = new Timeline(
-                                new KeyFrame(Duration.ZERO, 
-                                        new KeyValue(decimal.opacityProperty(), 0.0)), 
-                                new KeyFrame(new Duration(100), 
-                                        new KeyValue(decimal.opacityProperty(), 1.0)));
-                        fadein.play();
-                    }
-                }, new KeyValue(decimal.opacityProperty(), 0.0)));
-        fade.play();  
+        if(animation){     
+            //animateText(decimal, 1.0, 0.0);
+            decimal.setText(t);   
+            animateText(decimal, 0.0, 1.0);
         }else{
             decimal.setText(t);
         }

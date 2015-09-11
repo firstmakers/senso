@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.chart.*;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;

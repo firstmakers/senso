@@ -1,6 +1,4 @@
-.button {
 
-}
 .root{
     -fx-spacing:10;
     -fx-background-color: #eaeaea;
@@ -280,9 +278,7 @@
 }
 
 .button:hover{
-
     -fx-background-color: #e67827;
-
 }
 
 .button:focused{
@@ -313,6 +309,14 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position:center;   
 }
+#btnHelp{  
+    -fx-background-radius: 50%;
+    -fx-background-image: url("../images/question.png");
+    -fx-background-size: 24 24;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;   
+}
+
 
 #NumberSpinnerArrow {
     -fx-fill: white;
@@ -349,4 +353,18 @@
 .menu-item:focused .label {
     -fx-text-fill: white;
     -fx-font-size: 1.1em;
+}
+#title-text{
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+    -fx-fill: #635e98;
+}
+#description-text{
+    -fx-font-size: 12pt;
+    -fx-font-weight: normal;
+    -fx-fill: #7ca43c;
+}
+#linechart{
+    -fx-background-color: white;
+    -fx-border-radius: 10px;
 }

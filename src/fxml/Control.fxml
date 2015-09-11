@@ -20,7 +20,7 @@
       <Button fx:id="btnPause" layoutX="67.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" styleClass="btn" textFill="WHITE" />
       <Button fx:id="btnStop" layoutX="121.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" styleClass="btn" textFill="WHITE" />
       <Button fx:id="btnSave" layoutX="211.0" layoutY="72.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="48.0" styleClass="btn" textAlignment="RIGHT" textFill="WHITE" />
-      <GridPane fx:id="gridpane" hgap="2" layoutX="11.0" layoutY="15.0" prefHeight="53.0" prefWidth="247.0" vgap="2">
+      <GridPane fx:id="gridpane" hgap="1.0" layoutX="11.0" layoutY="15.0" prefHeight="53.0" prefWidth="247.0" vgap="1.0">
         <columnConstraints>
           <ColumnConstraints hgrow="NEVER" maxWidth="120.0" minWidth="10.0" prefWidth="102.0" />
           <ColumnConstraints hgrow="NEVER" maxWidth="173.0" minWidth="10.0" prefWidth="143.0" />

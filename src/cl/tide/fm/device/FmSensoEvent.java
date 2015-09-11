@@ -17,7 +17,7 @@ public class FmSensoEvent {
     private int integer;
     private int decimal;
     private double oldValue;
-      private int oldInteger;
+    private int oldInteger;
     private int oldDecimal;
 
     public FmSensoEvent(double newValue, double oldValue) {

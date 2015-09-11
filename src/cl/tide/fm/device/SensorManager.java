@@ -3,7 +3,7 @@
 package cl.tide.fm.device;
 
 import cl.tide.fm.model.Humidity;
-import cl.tide.fm.model.Light;
+import cl.tide.fm.model.Ligth;
 import cl.tide.fm.model.Sensor;
 import cl.tide.fm.model.SensorProfile;
 import cl.tide.fm.model.Temperature;
@@ -42,7 +42,7 @@ public class SensorManager {
             case SensorProfile.HUMIDITY:
                 return  new Humidity(id);
             case SensorProfile.LIGHT:
-                return new Light(id);
+                return new Ligth(id);
             default:
                 return new UnknownSensor(id);     
         }       

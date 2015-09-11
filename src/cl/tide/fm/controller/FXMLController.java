@@ -3,6 +3,7 @@ package cl.tide.fm.controller;
 import cl.tide.fm.components.*;
 import cl.tide.fm.device.*;
 import cl.tide.fm.model.*;
+import cl.tide.fm.tour.Tour;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -26,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,14 +44,15 @@ public class FXMLController implements Initializable, FmSensoListener {
 
     FmSenso fmSenso;
     @FXML Node AnchorPane;
-    @FXML private VBox sensorContainer;
-    @FXML private LineChart lineChart;
+    @FXML protected VBox sensorContainer;
+    @FXML protected LineChart lineChart;
     @FXML private ImageView status, logo; 
-    @FXML private Text firmware;
+    @FXML protected Text firmware;
+    @FXML Button btnHelp;
     private ArrayList<SensorView> ExternalSensorView;
     private ArrayList<SensorView> InternalSensorView;
     private DeviceInfo deviceInfo;
-    private Control control;
+    protected Control control;
     
     private ChartController mChart;
     //private TableViewController mTab;
@@ -65,7 +68,8 @@ public class FXMLController implements Initializable, FmSensoListener {
         //deviceInfo = new DeviceInfo();
         control = new Control();
         control.samples.setNumber(new BigDecimal(300));
-        control.interval.setNumber(BigDecimal.ONE);      
+        control.interval.setNumber(BigDecimal.ONE);    
+        
         control.btnStart.setOnAction((ActionEvent event) -> {
             clickStart();
         });
@@ -88,14 +92,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }      
         sensorContainer.getChildren().add(control);
-        //sensorContainer.getChildren().add(deviceInfo);
-
-        mChart = new ChartController(lineChart);
-        mChart.setExternalSensors(ExternalSensorView);
-        mChart.setInternalSensor(InternalSensorView);
-        //mTab = new TableViewController(tableView);
-        //mTab.setViews(sensorView);
-
+        configChart();
         if (fmSenso.isConnected()) {
             fmSenso.start();
         }
@@ -104,15 +101,24 @@ public class FXMLController implements Initializable, FmSensoListener {
         }
         setStatusDevice(fmSenso.getCurrentDevice());
         fm = new FileManager(ExternalSensorView);   
+        
+        btnHelp.setOnAction((ActionEvent event)->{
+            showTour(btnHelp.getScene().getWindow());
+        });
     }
     /*
      *Agrega los sensores internos de la tarjeta senso
      */
+    private void configChart(){
+        mChart = new ChartController(lineChart);
+        mChart.setExternalSensors(ExternalSensorView);
+        mChart.setInternalSensor(InternalSensorView);
+    }
 
     public void addInternalSensor() {
         //add internal sensor
         Sensor s = fmSenso.getSensorManager().getInternalSensors().get(0);
-        LightView view = new LightView(s);
+        LigthView view = new LigthView(s);
         view.setID(s.getId());
         view.setCustomSerie(new CustomSeries(view.getName()));
         InternalSensorView.add(view);
@@ -204,7 +210,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             if (s.getProfile() == (TypeSensor.TEMPERATURE)) {
                 sensor = new TemperatureView(s);
             } else if (s.getProfile() == (TypeSensor.LIGTH)) {
-                sensor = new LightView(s);
+                sensor = new LigthView(s);
             } else if (s.getProfile() == (TypeSensor.HUMIDITY)) {
                 sensor = new HumidityView(s);
             } else {
@@ -233,7 +239,7 @@ public class FXMLController implements Initializable, FmSensoListener {
                 setChanges(view, status);
             });
            
-            synchronized (FXMLController.this) {
+            synchronized (sensorContainer) {
                
                 sensorContainer.getChildren().add(node);
                 mChart.addSerie(view.getCustomSerie().getSerie());
@@ -249,7 +255,7 @@ public class FXMLController implements Initializable, FmSensoListener {
     private void removeView(final Node node) {
         Platform.runLater(() -> {
             SensorView view = (SensorView) node;
-            synchronized (FXMLController.this) {
+            synchronized (sensorContainer) {
                 mChart.removeSerie(view.getCustomSerie().getSerie());
                 Timeline fade = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
@@ -402,6 +408,12 @@ public class FXMLController implements Initializable, FmSensoListener {
         Platform.runLater(()->{
             firmware.setText("versión: "+firm);
         });   
+        
+    }
+    
+    public void showTour(Window win){
+        Tour t = new Tour(win);
+        t.showTour();
     }
 
 }
