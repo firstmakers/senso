@@ -3,5 +3,5 @@ Senso es una interfaz gráfica de medición que se comunica con la tarjeta Senso
 
 ## Descargar
 
-* [Windows](https://github.com/firstmakers/senso/blob/master/installers/windows/Senso-1.0.exe?raw=true) 
-* [OSX](https://github.com/firstmakers/senso/blob/master/installers/macosx/Senso-1.0.dmg?raw=true)
+* [Windows v1.0.1](https://github.com/firstmakers/senso/releases/download/v1.0.1/Senso-1.0.1.exe) 
+* [OSX v1.0.1](https://github.com/firstmakers/senso/releases/download/v1.0.1/Senso-1.0.1.dmg)
