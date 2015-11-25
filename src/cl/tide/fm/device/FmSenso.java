@@ -145,13 +145,15 @@ public void start() {
         if (oldCount > count) {
             List<Sensor> removed = sensorManager.getDetachedSensor(data);
             synchronized(this){
+                if(mListener!=null)
                 mListener.stream().forEach((l) -> {l.onSensorDetach(new ArrayList<>(removed));});
             }
             sensorManager.removeSensor(removed);
         } else{
             List<Sensor> added = sensorManager.getAttachedSensor(data);
             synchronized(this){
-                mListener.stream().forEach((l) -> {l.onSensorAttach(new ArrayList<>(added));});
+                if(mListener!=null)
+                    mListener.stream().forEach((l) -> {l.onSensorAttach(new ArrayList<>(added));});
             }
             sensorManager.addSensor(added);
         } 
