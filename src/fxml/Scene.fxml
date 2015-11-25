@@ -27,34 +27,7 @@
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <TabPane id="tabPane" cache="true" prefHeight="612.0" prefWidth="640.0" style="-fx-background-radius: 5px;" styleClass="tabPane" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
-                          <tabs>
-                            <Tab style="-fx-font-smoothing-type: white;" text="Gráfico">
-                              <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="473.0" prefWidth="655.0">
-                                       <children>
-                                          <LineChart fx:id="lineChart" prefHeight="533.0" prefWidth="655.0" style="-fx-background-radius: 5px; -fx-background-color: white;" styleClass="chartContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <xAxis>
-                                              <CategoryAxis side="BOTTOM" />
-                                            </xAxis>
-                                            <yAxis>
-                                              <NumberAxis side="LEFT" />
-                                            </yAxis>
-                                          </LineChart>
-                                       </children>
-                                    </AnchorPane>
-                              </content>
-                            </Tab>
-                            <!--Tab text="Tabla">
-                              <content>
-                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                         <children>
-                                                            <TableView fx:id="tableView" styleClass="tabContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                         </children>
-                                                      </AnchorPane>
-                                                </content>
-                                              </Tab-->
-                          </tabs>
+                        <TabPane id="tabPane" fx:id="tabPane" cache="true" prefHeight="612.0" prefWidth="640.0" style="-fx-background-radius: 5px;" styleClass="tabPane" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>

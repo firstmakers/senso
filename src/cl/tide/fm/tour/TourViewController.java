@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
@@ -83,6 +82,7 @@ public final class TourViewController extends VBox {
         description.setId("description-text");
         title = new Text();
         title.setId("title-text");
+        description.setText("Posiciona el mouse sobre los elementos para ver la descripción");
 
         textcontainer.getChildren().addAll(title, description);
         nodes.add(getControlView());

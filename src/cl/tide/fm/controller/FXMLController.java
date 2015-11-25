@@ -24,11 +24,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -45,17 +45,18 @@ public class FXMLController implements Initializable, FmSensoListener {
     FmSenso fmSenso;
     @FXML Node AnchorPane;
     @FXML protected VBox sensorContainer;
-    @FXML protected LineChart lineChart;
+    @FXML protected TabPane tabPane;
     @FXML private ImageView status, logo; 
     @FXML protected Text firmware;
     @FXML Button btnHelp;
-    private ArrayList<SensorView> ExternalSensorView;
-    private ArrayList<SensorView> InternalSensorView;
-    private DeviceInfo deviceInfo;
+    private ArrayList<SensorView> sensors;
+   
     protected Control control;
     
-    private ChartController mChart;
-    //private TableViewController mTab;
+    
+    
+    //private ChartController mChart;
+    private Tabcontroller mTab;
     private Timer mTimer;
     private boolean pause = true;
     private int totalSamples = 0;
@@ -85,34 +86,31 @@ public class FXMLController implements Initializable, FmSensoListener {
         try {
             fmSenso = new FmSenso();
             fmSenso.addFmSensoListener(this);
-            ExternalSensorView = new ArrayList<>();
-            InternalSensorView = new ArrayList<>();
-
+            sensors = new ArrayList<>();
         } catch (HidException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }      
         sensorContainer.getChildren().add(control);
-        configChart();
-        if (fmSenso.isConnected()) {
-            fmSenso.start();
-        }
-        if (InternalSensorView.isEmpty() && fmSenso.isConnected()) {
+        
+        if (sensors.isEmpty() && fmSenso.isConnected()) {
             addInternalSensor();
         }
         setStatusDevice(fmSenso.getCurrentDevice());
-        fm = new FileManager(ExternalSensorView);   
+        fm = new FileManager(sensors);   
         
         btnHelp.setOnAction((ActionEvent event)->{
             showTour(btnHelp.getScene().getWindow());
         });
+        if (fmSenso.isConnected()) {
+            fmSenso.start();
+        }
+      
     }
     /*
      *Agrega los sensores internos de la tarjeta senso
      */
     private void configChart(){
-        mChart = new ChartController(lineChart);
-        mChart.setExternalSensors(ExternalSensorView);
-        mChart.setInternalSensor(InternalSensorView);
+        mTab = new Tabcontroller(tabPane, sensors); 
     }
 
     public void addInternalSensor() {
@@ -121,7 +119,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         LigthView view = new LigthView(s);
         view.setID(s.getId());
         view.setCustomSerie(new CustomSeries(view.getName()));
-        InternalSensorView.add(view);
+        sensors.add(view);
         addView(view);
     }
 
@@ -129,12 +127,13 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     public void close() {
         fmSenso.stop();
+        mTab.stop();
     }
 
     @Override
     public void onClose() {
         System.out.println("Closed");
-        mChart.stop();
+        //mChart.stop();
         clickStop();
         firmware.setText("");
         //mTab.stopCapture();
@@ -143,10 +142,12 @@ public class FXMLController implements Initializable, FmSensoListener {
     @Override
     public void onStart() {
         System.out.println("Start");
-        if(fmSenso.isRunning()){
-            mChart.start();
-            fmSenso.addFmSensoListener(this);
-        }
+        Platform.runLater(() -> {
+            if (fmSenso.isRunning()) {
+                fmSenso.addFmSensoListener(this);
+                configChart();          
+            }
+        });
         //mTab.startCapture();
     }
 
@@ -156,7 +157,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         addInternalSensor();
         System.out.println("New device attached");
         if (!fmSenso.isRunning()) {
-            fmSenso.start();
+            fmSenso.start();  
         }
     }
 
@@ -164,11 +165,9 @@ public class FXMLController implements Initializable, FmSensoListener {
     public void onDetachedDevice(HidDevice device) {
         setStatusDevice(device);
         Platform.runLater(() -> {
-            mChart.clear();
-            sensorContainer.getChildren().removeAll(ExternalSensorView);
-            sensorContainer.getChildren().removeAll(InternalSensorView);
-            ExternalSensorView.clear();
-            InternalSensorView.clear();
+            mTab.closeAllTab();
+            sensorContainer.getChildren().removeAll(sensors);
+            sensors.clear();
             System.out.println("Current device Detached ");
         });
     }
@@ -192,10 +191,11 @@ public class FXMLController implements Initializable, FmSensoListener {
         String id;
         for (Sensor s : removedList) {
             id = s.getId();
-            for (int i = 0; i < ExternalSensorView.size(); i++) {
-                if (ExternalSensorView.get(i).getID().equals(id)) {
-                    removeView(ExternalSensorView.get(i));
-                    ExternalSensorView.remove(i);
+            for (int i = 0; i < sensors.size(); i++) {
+                if (sensors.get(i).getID().equals(id)) {
+                    removeView(sensors.get(i));
+                    mTab.removeSensorview(sensors.get(i));
+                    sensors.remove(i);
                 }
             }
         }
@@ -218,17 +218,18 @@ public class FXMLController implements Initializable, FmSensoListener {
             }
             sensor.setID(s.getId());
             sensor.setCustomSerie(new CustomSeries(sensor.getName()));
-            ExternalSensorView.add(sensor);
+            sensors.add(sensor);
             addView(sensor);
+            mTab.addSensorview(sensor);
 
         }
     }
 
     private void setChanges(SensorView view, boolean status) {
         if (status) {
-            mChart.addSerie(view.getCustomSerie().getSerie());
+            mTab.addSensorview(view);
         } else {
-            mChart.removeSerie(view.getCustomSerie().getSerie());
+            mTab.removeSensorview(view);
         }
     }
 
@@ -238,11 +239,9 @@ public class FXMLController implements Initializable, FmSensoListener {
             view.addListener((boolean visible, CustomSeries customSerie, Boolean status) -> {
                 setChanges(view, status);
             });
-           
-            synchronized (sensorContainer) {
-               
+            synchronized (sensorContainer) {            
                 sensorContainer.getChildren().add(node);
-                mChart.addSerie(view.getCustomSerie().getSerie());
+                //mChart.addSerie(view.getCustomSerie().getSerie());
                 Timeline fadein = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
                         new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
@@ -256,7 +255,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         Platform.runLater(() -> {
             SensorView view = (SensorView) node;
             synchronized (sensorContainer) {
-                mChart.removeSerie(view.getCustomSerie().getSerie());
+                //mChart.removeSerie(view.getCustomSerie().getSerie());
                 Timeline fade = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
                         new KeyFrame(new Duration(200), e -> {
@@ -277,6 +276,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         int smp = control.samples.getNumber().intValue();
         fm.setHeader(getHeader());
         if (fmSenso.isRunning() && userInterval > 999 && smp > 0) {
+            mTab.start();
             control.btnSave.setDisable(true);
             control.btnStart.setDisable(true);
             mTimer = new Timer();
@@ -293,7 +293,6 @@ public class FXMLController implements Initializable, FmSensoListener {
                     updateUI();
                 }
             }, 0, userInterval);
-
         }
     }
 
@@ -315,11 +314,11 @@ public class FXMLController implements Initializable, FmSensoListener {
     }
 
     private String[] getHeader() {
-        String[] header = new String[ExternalSensorView.size() + InternalSensorView.size() + 1];
+        String[] header = new String[sensors.size() + 1];
         header[0] = "Hora";
-        header[1] = InternalSensorView.get(0).getName();
-        for (int i = 2; i < header.length; i++) {
-            header[i] = ExternalSensorView.get(i - 2).getName();
+      
+        for (int i = 1; i < header.length; i++) {
+            header[i] = sensors.get(i - 1).getName();
         }
         return header;
     }
@@ -328,16 +327,12 @@ public class FXMLController implements Initializable, FmSensoListener {
         final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date d = new Date();
         String date = dateFormat.format(d);
-        Object[] ob = new Object[ExternalSensorView.size() + InternalSensorView.size() + 1];
+        Object[] ob = new Object[sensors.size() + 1];
 
         for (int i = 0; i < ob.length; i++) {
             ob[i] = date;
             int cellIndex = 1;
-            for (SensorView v : InternalSensorView) {
-                ob[cellIndex] = v.getSensor().getValue();
-                cellIndex++;
-            }
-            for (SensorView v : ExternalSensorView) {
+            for (SensorView v : sensors) {
                 ob[cellIndex] = v.getSensor().getValue();
                 cellIndex++;
             }
@@ -359,6 +354,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         System.out.println("Clicked Pause");
         control.btnStart.setDisable(false);
         control.btnSave.setDisable(false);
+        mTab.stop();
         if (mTimer != null) {
             mTimer.cancel();
             this.pause = true;
@@ -370,7 +366,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         System.out.println("Clicked Stop");
         control.btnSave.setDisable(false);
         control.btnStart.setDisable(false);
-
+        mTab.stop();
         if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
