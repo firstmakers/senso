@@ -16,7 +16,7 @@
             <fx:resources>
                 <fx:fileset dir="${basedir}/${dist.dir}" includes="*.jar"/>
                 <fx:fileset dir="${basedir}/${dist.dir}" includes="lib/*"/>
-                <!--fx:fileset dir="${basedir}/${dist.dir}" includes="resources/**"/-->
+                <fx:fileset dir="${basedir}/${dist.dir}" includes="resources/**"/>
             </fx:resources>
             <fx:info title="${application.title}" vendor="${application.vendor}"/>
         </fx:deploy>
