@@ -63,7 +63,6 @@ public class ChartTab {
     
     
     public void addSensorview(SensorView s){
-        System.out.println("Añadido sensor de : " + s.getSensor().getProfile().toString());
         Platform.runLater(()->{
             addSerie(s.getCustomSerie().getSerie());
             sensors.add(s);
@@ -73,8 +72,10 @@ public class ChartTab {
     }
     
     public void removeSensorview(SensorView s){
-        removeSerie(s.getCustomSerie().getSerie());
-        sensors.remove(s);
+        Platform.runLater(()->{
+            removeSerie(s.getCustomSerie().getSerie());
+            sensors.remove(s);
+        });
     }
     public void setYAxisLabel(String label){
         yAxis.setLabel(label);
@@ -95,7 +96,6 @@ public class ChartTab {
             @Override
             public void run() {
                 if (sensors.size() > 0) {
-                    System.out.println("Total views " + sensors.size());
                     DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                     Date d = new Date();
                     String date = dateFormat.format(d);

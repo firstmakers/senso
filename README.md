@@ -1,7 +1,12 @@
 # Senso
-Senso es una interfaz gráfica de medición que se comunica con la tarjeta Senso, es capaz de leer los datos de sensores externos e internos.
+Es una herramienta de medición, es capaz de leer los datos de sensores externos e internos.
 
-## Descargar
+# Cambios
 
-* [Windows v1.0.1](https://github.com/firstmakers/senso/releases/download/v1.0.1/Senso-1.0.1.exe) 
-* [OSX v1.0.1](https://github.com/firstmakers/senso/releases/download/v1.0.1/Senso-1.0.1.dmg)
+## v1.0.3
+* Se agregan tabs y gráficos independientes agrupados por tipo de sensor.
+* Se corrige bug de series duplicadas en el gráfico.
+* Los tabs aparecen automáticamente cuando se conecta un sensor, desaparecen cuando no hay sensores conectados.
+* Se agrega nombre y versión del software.
+
+

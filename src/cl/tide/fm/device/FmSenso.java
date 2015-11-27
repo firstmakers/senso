@@ -111,17 +111,17 @@ public void start() {
         switch(data[0]){
             case Commands.EXTERNAL_SENSORS:
                 processExternalSensor(data);
-                System.out.println("MEDICION EXTERNA "+Arrays.toString(data));
+                //System.out.println("MEDICION EXTERNA "+Arrays.toString(data));
                 break;
             case Commands.INTERNAL_SENSORS:
                 processInternalSensor(data);
-                System.out.println("MEDICION INTERNA"+Arrays.toString(data));
+                //System.out.println("MEDICION INTERNA"+Arrays.toString(data));
                 break;
             case Commands.FIRMWARE:
                 setFirmware(data);
             default:
                 ExternalSensorStatus(data);
-                System.out.println("REPORTE DE SENSORES CONECTADOS "+Arrays.toString(data));
+                //System.out.println("REPORTE DE SENSORES CONECTADOS "+Arrays.toString(data));
         }         
     }
 
@@ -151,7 +151,7 @@ public void start() {
             sensorManager.removeSensor(removed);
         } else{
             List<Sensor> added = sensorManager.getAttachedSensor(data);
-            synchronized(this){
+            synchronized(this){      
                 if(mListener!=null)
                     mListener.stream().forEach((l) -> {l.onSensorAttach(new ArrayList<>(added));});
             }

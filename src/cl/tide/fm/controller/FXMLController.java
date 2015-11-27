@@ -102,6 +102,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             showTour(btnHelp.getScene().getWindow());
         });
         if (fmSenso.isConnected()) {
+            configChart();
             fmSenso.start();
         }
       
@@ -143,9 +144,10 @@ public class FXMLController implements Initializable, FmSensoListener {
     public void onStart() {
         System.out.println("Start");
         Platform.runLater(() -> {
+          
             if (fmSenso.isRunning()) {
                 fmSenso.addFmSensoListener(this);
-                configChart();          
+                         
             }
         });
         //mTab.startCapture();
@@ -157,6 +159,7 @@ public class FXMLController implements Initializable, FmSensoListener {
         addInternalSensor();
         System.out.println("New device attached");
         if (!fmSenso.isRunning()) {
+            configChart();
             fmSenso.start();  
         }
     }

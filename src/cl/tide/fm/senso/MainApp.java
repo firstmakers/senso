@@ -20,12 +20,16 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
     
     private FXMLLoader fxmlLoader;
+    private String version;
+    private String name;
 
     private Stage st;
 
     @Override
     public void start(Stage stage) throws Exception {
         st = stage;
+        name = "Senso";
+        version = "1.0.3";
         URL location = getClass().getResource("/fxml/Scene.fxml");
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(location);
@@ -36,7 +40,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         stage.getIcons().add(new Image("/images/senso.png"));
-        stage.setTitle("Senso");
+        stage.setTitle(name.concat(" ").concat(version));
         stage.setScene(scene);
         //min sizes
         stage.setMinWidth(960.0);
