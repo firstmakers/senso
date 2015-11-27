@@ -22,7 +22,6 @@ public class MainApp extends Application {
     private FXMLLoader fxmlLoader;
     private String version;
     private String name;
-
     private Stage st;
 
     @Override
@@ -62,7 +61,6 @@ public class MainApp extends Application {
             });
             help.getItems().add(item);
             creator.addMenu(help);
-
         }
 
     }

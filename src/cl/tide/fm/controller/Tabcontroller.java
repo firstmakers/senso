@@ -130,6 +130,7 @@ public class Tabcontroller {
 
     /**
      * agrega un tab
+     * @param tab
      */
     public void addTab(Tab tab) {
         Platform.runLater(()->{if(!tabPane.getTabs().contains(tab))tabPane.getTabs().add(tab);});  
@@ -137,11 +138,10 @@ public class Tabcontroller {
 
     /**
      * borra un tab *
+     * @param tab
      */
     public void deleteTab(Tab tab) {
-        Platform.runLater(()->{
-           tabPane.getTabs().remove(tab);
-        });
+        Platform.runLater(()->{tabPane.getTabs().remove(tab);});
    
     }
 
@@ -154,7 +154,7 @@ public class Tabcontroller {
             numtemp++;
             numTempSensor.set(numtemp);
             TemperatureChart.addSensorview(s);
-            System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
+            //System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
         }
     }
 
@@ -167,7 +167,7 @@ public class Tabcontroller {
             numtemp--;
             TemperatureChart.removeSensorview(s);
             numTempSensor.set(numtemp);
-            System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
+            //System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
         }
 
     }
