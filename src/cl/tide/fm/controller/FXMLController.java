@@ -128,7 +128,8 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     public void close() {
         fmSenso.stop();
-        mTab.stop();
+        if(mTab != null)
+            mTab.stop();
     }
 
     @Override
