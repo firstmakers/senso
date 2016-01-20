@@ -5,12 +5,18 @@
  */
 package cl.tide.fm.utilities;
 
+import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
+import com.sun.javafx.scene.control.skin.TextFieldSkin;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -122,6 +128,9 @@ public class IntegerField extends TextField {
           }
           setValue(intValue);
       });
+      //reemplaza el menu contextual por uno vacio
+      this.setContextMenu(new ContextMenu());
+
     }
     
 }
