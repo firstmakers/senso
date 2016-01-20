@@ -95,7 +95,7 @@ public final class TourViewController extends VBox {
      */
     private Control getControlView() {
         Control ctr = new Control();
-        ctr.samples.setNumber(new BigDecimal(300));
+        /*ctr.samples.setNumber(new BigDecimal(300));
         ctr.interval.setNumber(BigDecimal.ONE);
         ctr.interval.setOnMouseEntered((MouseEvent e) -> {
             animateText(title);
@@ -106,7 +106,7 @@ public final class TourViewController extends VBox {
             animateText(title);
             title.setText("Muestras\n");
             description.setText("Representa al total de mediciones por cada sensor.");
-        });
+        });*/
         ctr.btnStart.setOnMouseEntered((MouseEvent event) -> {
             animateText(title);
             title.setText("Botón Iniciar\n");
@@ -126,12 +126,12 @@ public final class TourViewController extends VBox {
             description.setText("Al hacer Click en este botón, detiene "
                     + "la captura de datos.");
         });
-        ctr.btnSave.setOnMouseEntered((MouseEvent event) -> {
+        /*ctr.btnSave.setOnMouseEntered((MouseEvent event) -> {
             animateText(title);
             title.setText("Botón guardar\n");
             description.setText("Al hacer Click en este botón, se"
                     + "genera un archivo con las mediciones capturadas.");
-        });
+        });*/
         ctr.progressBar.setOnMouseEntered((MouseEvent event) -> {
             animateText(title);
             title.setText("Barra de Progreso\n");
@@ -154,7 +154,7 @@ public final class TourViewController extends VBox {
             title.setText("Valor Actual\n");
             description.setText("Muestra el valor actual del sensor.");
         });
-        sensorview.name.setOnMouseEntered((MouseEvent e) -> {
+       /* sensorview.name.setOnMouseEntered((MouseEvent e) -> {
             animateText(title);
             title.setText("Nombre del sensor\n");
             description.setText("Muestra el Nombre actual del sensor. Es editable"
@@ -169,7 +169,7 @@ public final class TourViewController extends VBox {
             animateText(title);
             title.setText("Selector de color\n");
             description.setText("Escoje un color para distinguir cada sensor.");
-        });
+        });*/
         sensorview.setSensor(new Ligth("1"));
         return (SensorView) sensorview;
     }
@@ -233,7 +233,7 @@ public final class TourViewController extends VBox {
             }
         });
 
-        fastUpdate.setOnAction(e -> {
+        /*fastUpdate.setOnAction(e -> {
             if (fastUpdate.isSelected()) {
 
                 slowUpdate.setSelected(false);
@@ -256,15 +256,15 @@ public final class TourViewController extends VBox {
                 normalUpdate.setSelected(false);
 
             }
-        });
+        });*/
 
         ContextMenu menu = new ContextMenu(
                 chartManager,
                 clearChart,
-                new SeparatorMenuItem(),
+                new SeparatorMenuItem()/*,
                 fastUpdate,
                 normalUpdate,
-                slowUpdate
+                slowUpdate*/
         );
         return menu;
     }

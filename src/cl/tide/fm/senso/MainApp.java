@@ -28,7 +28,7 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         st = stage;
         name = "Senso";
-        version = "1.0.3";
+        version = "1.0.4";
         URL location = getClass().getResource("/fxml/Scene.fxml");
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(location);
@@ -54,13 +54,15 @@ public class MainApp extends Application {
             creator.renameMenuItem(0, -1, "Salir de Senso");
             creator.renameApplicationMenu("Senso");
 
-            Menu help = new Menu("Ayuda");
+            /*Menu help = new Menu("Ayuda");
             MenuItem item = new MenuItem("Ver ayuda");
             item.setOnAction((ActionEvent event) -> {
                 showHelp(event);
             });
             help.getItems().add(item);
-            creator.addMenu(help);
+            creator.addMenu(help);*/
+            FXMLController controller = (FXMLController)fxmlLoader.getController();
+            controller.setStage(st);
         }
 
     }

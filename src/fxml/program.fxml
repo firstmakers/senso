@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import cl.tide.fm.utilities.*?>
+
+<fx:root id="AnchorPane" fx:id="container" maxHeight="170.0" maxWidth="410.0" minHeight="170.0" minWidth="410.0" prefHeight="170.0" prefWidth="410.0" style="-fx-background-color: white;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   
+   <children>
+ 
+
+      <IntegerField fx:id="hour" alignment="CENTER" layoutX="20.0" layoutY="21.0" prefHeight="27" prefWidth="45" />
+      <IntegerField fx:id="minute" alignment="CENTER" layoutX="66.0" layoutY="21.0" prefHeight="27" prefWidth="45" />
+      <IntegerField fx:id="second" alignment="CENTER" layoutX="112.0" layoutY="21.0" prefHeight="27" prefWidth="45" />
+      
+      <Button fx:id="ok" layoutX="310.0" layoutY="120.0" mnemonicParsing="false" prefWidth="80.0" text="Ok" />
+      <Button fx:id="cancel" layoutX="216.0" layoutY="120.0" mnemonicParsing="false" prefWidth="80.0" text="Cancelar" />
+      <Separator layoutX="20.0" layoutY="107.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Text fx:id="validator" fill="#e80b0b" layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="370.0" />
+      <Button fx:id="program" layoutX="279.0" layoutY="21.0" mnemonicParsing="false" onAction="#program" prefHeight="27.0" prefWidth="111.0" text="Programar" />
+
+      <Label fx:id="" layoutX="170" layoutY="30" text="hh:mm:ss" />
+      <Label fx:id="twopoint" layoutX="63" layoutY="21" text=":" />
+      <Label fx:id="twopoint2" layoutX="109" layoutY="21" text=":" />
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <opaqueInsets>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </opaqueInsets>
+</fx:root>

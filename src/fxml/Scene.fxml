@@ -14,7 +14,43 @@
 
 <AnchorPane id="root" fx:id="root" minHeight="600.0" minWidth="800.0" prefHeight="640.0" prefWidth="960.0" styleClass="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cl.tide.fm.controller.FXMLController">
    <children>
-      <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <MenuBar fx:id="mainMenu" layoutY="-4.0" prefHeight="29.0" prefWidth="960.0" AnchorPane.leftAnchor="-10.0" AnchorPane.rightAnchor="-10.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="Archivo">
+               <items>
+                <MenuItem fx:id="save" mnemonicParsing="false" onAction="#handleMenuSave" text="Guardar..." />
+               </items></Menu>
+            <Menu mnemonicParsing="false" text="Muestras">
+              <items>
+                  <Menu mnemonicParsing="false" text="Intervalo">
+                    <items>
+                        <CheckMenuItem fx:id="menuOneSecond" mnemonicParsing="false" onAction="#handleMenuInterval" selected="true" text="1 seg." />
+                        <CheckMenuItem fx:id="menuTenSeconds" mnemonicParsing="false" onAction="#handleMenuInterval" text="10 seg." />
+                        <CheckMenuItem fx:id="menuThirtySeconds" mnemonicParsing="false" onAction="#handleMenuInterval" text="30 seg." />
+                        <CheckMenuItem fx:id="menuOneMin" mnemonicParsing="false" onAction="#handleMenuInterval" text="1 min." />
+                        <SeparatorMenuItem mnemonicParsing="false" text="personalizado" />
+                      <MenuItem fx:id="menuCustomInterval" mnemonicParsing="false" onAction="#handleMenuInterval" text="definir ..." />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Cantidad ">
+                    <items>
+                        <CheckMenuItem fx:id="menuHundredSamples" mnemonicParsing="false" onAction="#handleMenuSample" selected="true" text="100 muestras" />
+                        <CheckMenuItem fx:id="menuOneThousandSamples" mnemonicParsing="false" onAction="#handleMenuSample" text="1000 muestras" />
+                        <CheckMenuItem fx:id="menuTenThousandSamples" mnemonicParsing="false" onAction="#handleMenuSample" text="10000 muestras" />
+                        <SeparatorMenuItem mnemonicParsing="false" text="personalizado" />
+                        <MenuItem fx:id="menuCustomSample" mnemonicParsing="false" onAction="#handleMenuSample" text="definir ..." />
+                    </items>
+                  </Menu>
+                  <MenuItem fx:id="program" mnemonicParsing="false" onAction="#openProgram" text="Iniciar..." />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Ayuda">
+              <items>
+                <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#handleMenuHelp" text="ver ayuda ..." />
+              </items>
+            </Menu>
+         </menus></MenuBar>
+      <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
          <children>
             <VBox id="sensorContainer" fx:id="sensorContainer" minHeight="500.0" minWidth="280.0" prefHeight="612.0" prefWidth="280.0" spacing="10.0" style="-fx-background-color: lightgray; -fx-background-radius: 10px;" styleClass="sensorContainer">
                <HBox.margin>
@@ -29,13 +65,22 @@
                      <children>
                         <TabPane id="tabPane" fx:id="tabPane" cache="true" prefHeight="612.0" prefWidth="640.0" style="-fx-background-radius: 5px;" styleClass="tabPane" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets />
+                              <Insets right="-19.0" />
                            </HBox.margin>
                         </TabPane>
+                        <Button id="clearChart" fx:id="clearChart" mnemonicParsing="false" styleClass="clearChart">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="5.0" style="-fx-background-color: white; -fx-background-radius: 5px;" VBox.vgrow="ALWAYS">
                      <children>
+                        <Text fx:id="info" fill="#6b6b6b" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="462.24755859375" HBox.hgrow="ALWAYS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Text>
                         <VBox alignment="CENTER_LEFT" maxHeight="140.0" prefHeight="140.0" prefWidth="100.0" spacing="2.0">
                            <children>
                               <ImageView fx:id="logo" cacheHint="QUALITY" fitHeight="30.0" fitWidth="135.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" styleClass="logo">
@@ -76,7 +121,6 @@
             </VBox>
          </children>
       </HBox>
-      <Button fx:id="btnHelp" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" styleClass="btn" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="3.0" />
    </children>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

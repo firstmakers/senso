@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import cl.tide.fm.utilities.*?>
+
+<fx:root id="AnchorPane" fx:id="container" maxHeight="150.0" maxWidth="410.0" minHeight="150.0" minWidth="410.0" prefHeight="150.0" prefWidth="410.0" style="-fx-background-color: white;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   
+   <children>
+      <!--Label layoutX="20.0" layoutY="14.0" text="Intervalo entre muestras:" /-->
+      <!--de.thomasbolz.javafx.NumberSpinner fx:id="sample" alignment="CENTER_RIGHT" layoutX="212.0" layoutY="39.0" prefHeight="27.0" prefWidth="175.0" /-->
+      <Label layoutX="212.0" layoutY="30" text="número de muestras" />
+
+      <IntegerFieldSample fx:id="sample" alignment="CENTER_RIGHT" layoutX="20.0" layoutY="21.0" prefHeight="27" prefWidth="125" />
+      
+      <Button fx:id="ok" layoutX="310.0" layoutY="113.0" mnemonicParsing="false" onAction="#clickOk" prefWidth="80.0" text="Ok" />
+      <Button fx:id="cancel" layoutX="212.0" layoutY="113.0" mnemonicParsing="false" prefWidth="80.0" text="Cancelar" />
+      <Separator layoutX="105.0" layoutY="97.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Text fx:id="validator" fill="#e80b0b" layoutX="20.0" layoutY="87.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="370.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+
+</fx:root>

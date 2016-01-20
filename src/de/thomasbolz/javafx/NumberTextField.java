@@ -9,7 +9,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 
 /**
@@ -96,6 +95,8 @@ public class NumberTextField extends TextField {
             }
         });
     }
+    
+ 
 
     /**
      * Tries to parse the user input to a number according to the provided

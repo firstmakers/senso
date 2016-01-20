@@ -38,7 +38,5 @@ public class UnknownView extends SensorView {
                 setDecimal(value.getDecimal()+"");
             }
         });
-    }
-
-    
+    }   
 }

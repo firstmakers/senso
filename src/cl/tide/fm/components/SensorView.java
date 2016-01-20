@@ -19,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,6 +45,7 @@ public class SensorView extends VBox{
     @FXML public ImageView icon;
     @FXML private Rectangle background;
     @FXML public ColorPicker colorPicker;
+    @FXML private MenuButton sensorMenu;
     private FXMLLoader fxmlLoader;
     private String ID;
     private Color color;
@@ -60,6 +62,7 @@ public class SensorView extends VBox{
         fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/BaseSensor.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
+        
    
         try {
             fxmlLoader.load();
@@ -87,6 +90,7 @@ public class SensorView extends VBox{
            }          
         });
        animation = true;
+       
     }
     
     /*
@@ -137,9 +141,7 @@ public class SensorView extends VBox{
         if(animation){   
             //animateText(integer, 1.0, 0.0);
             integer.setText(value.concat("."));
-            animateText(integer, 0.0, 1.0);
-            
-            
+            animateText(integer, 0.0, 1.0);  
         }else{
             integer.setText(value.concat("."));
         }
@@ -218,5 +220,5 @@ public class SensorView extends VBox{
 
     public void setSerieVisibility(boolean serieVisibility) {
         this.serieVisibility = serieVisibility;
-    }
+    }  
 }

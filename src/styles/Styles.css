@@ -3,6 +3,11 @@
     -fx-spacing:10;
     -fx-background-color: #eaeaea;
     -fx-focus-color: transparent;
+    -fx-accent: rgb(153, 204, 255);
+
+}
+.textfield:selected, textfield:focused{
+    -fx-background-color: gray;
 }
 .sensorContainer{
     
@@ -317,6 +322,15 @@
     -fx-background-position:center;   
 }
 
+#sensorSettings{
+    -fx-background-image: url("../images/gear.png");
+    -fx-background-size: 16 16;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;  
+}
+#sensorSettings .arrow{
+    -fx-background-color: transparent;
+}
 
 #NumberSpinnerArrow {
     -fx-fill: white;
@@ -334,9 +348,12 @@
     /*    -fx-background-radius:0;*/
 }
 .sensorname{
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
+    /*-fx-background-color: transparent;*/
+    -fx-text-fill: gray;
+    -fx-padding: 4px 2px;
+    
 }
+/*
 .context-menu{
     -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em;
     -fx-background-color: #31a0eb;
@@ -353,7 +370,7 @@
 .menu-item:focused .label {
     -fx-text-fill: white;
     -fx-font-size: 1.1em;
-}
+}*/
 #title-text{
     -fx-font-size: 14pt;
     -fx-font-weight: bold;
@@ -367,4 +384,49 @@
 #linechart{
     -fx-background-color: white;
     -fx-border-radius: 10px;
+}
+
+.combo-box .arrow-button{
+    -fx-padding: 2px;
+    -fx-background-color: white;
+}
+.combo-box .cell {
+    -fx-padding: 2px;
+    -fx-alignment: CENTER;
+    -fx-background-color: white;
+}
+.combo-box{-fx-border-color: lightgrey;}
+
+.IntegerField{
+    -fx-font-size: 17pt;
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+    -fx-border-color:dimgrey;
+}
+
+/*.IntegerField:focused{
+    -fx-border-color:#e69227;
+    -fx-border-radius:2px;
+}
+.IntegerField:selected{
+    -fx-focus-color:#7ca43c;
+}*/
+
+
+#twopoint, #twopoint2{
+    -fx-font-size: 15pt;
+}
+#programcnt{
+    -fx-background-color: white;
+}
+#clearChart{
+    -fx-background-image: url("../images/trash24.png");
+    -fx-background-size: 24 24;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center; 
+    -fx-background-color: transparent;
+}
+
+#clearChart:hover{
+    -fx-opacity: 0.6;
 }

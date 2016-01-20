@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.geometry.*?>
@@ -19,23 +21,63 @@
             <Rectangle id="background" fx:id="background" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="65.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" style="-fx-arc-width: 10; -fx-arc-height: 10;" styleClass="background" width="270.0" />
             <ImageView id="icon" fx:id="icon" fitHeight="60.0" fitWidth="60.0" layoutX="6.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
             </ImageView>
-            <Text id="unit" fx:id="unit" fill="WHITE" layoutX="226.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="unit" text="ºC" textAlignment="RIGHT" wrappingWidth="32.5315055847168">
+            <Text id="unit" fx:id="unit" fill="WHITE" layoutX="202.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="unit" text="ºC" textAlignment="RIGHT" wrappingWidth="32.5315055847168">
                <font>
                   <Font size="14.0" />
                </font></Text>
-            <Text id="decimal" fx:id="decimal" fill="WHITE" layoutX="250.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0" textAlignment="RIGHT">
+            <Text id="decimal" fx:id="decimal" fill="WHITE" layoutX="226.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0" textAlignment="RIGHT">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
-            <Text id="integer" fx:id="integer" fill="WHITE" layoutX="90.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0." textAlignment="RIGHT" wrappingWidth="158.85365676879883">
+            <Text id="integer" fx:id="integer" fill="WHITE" layoutX="66.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="value" text="0." textAlignment="RIGHT" wrappingWidth="158.85365676879883">
                <font>
-                  <Font size="36.0" />
+                  <Font size="40.0" />
                </font>
             </Text>
-            <ColorPicker id="picker" fx:id="colorPicker" layoutX="212.0" layoutY="39.0" prefHeight="26.0" prefWidth="33.0" style="-fx-background-color: transparent;" styleClass="button" />
-            <CheckBox fx:id="cbx" layoutX="241.0" layoutY="44.0" mnemonicParsing="false" />
-            <TextField fx:id="name" layoutX="60.0" layoutY="38.0" prefHeight="26.0" prefWidth="148.0" styleClass="sensorname" />
+            <ColorPicker fx:id="colorPicker" cacheHint="QUALITY" editable="true" layoutX="243.0" layoutY="5.0" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: transparent;" styleClass="button" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="6.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <tooltip>
+                  <Tooltip text="selecciona el color" />
+               </tooltip>
+            </ColorPicker>
+            <MenuButton id="sensorSettings" fx:id="sensorMenu" contentDisplay="RIGHT" graphicTextGap="0.0" layoutX="229.0" layoutY="2.0" lineSpacing="2.0" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" popupSide="RIGHT" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: transparent;" wrapText="true" AnchorPane.bottomAnchor="6.0" AnchorPane.rightAnchor="2.0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <items>
+                  <Menu mnemonicParsing="false" text="nombre...">
+                    <items>
+                        <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="seleccona el nombre del sensor">
+                           <content>
+                              <TextField fx:id="name" promptText="name">
+                                 <tooltip>
+                                    <Tooltip text="editar nombre del sensor" />
+                                 </tooltip>
+                              </TextField>
+                           </content>
+                        </CustomMenuItem>
+                    </items>
+                  </Menu>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="Mostrar la serie del sensor en el gráfico">
+                     <content>
+                      <CheckBox fx:id="cbx" text="ver en gráfico">
+                           <tooltip>
+                              <Tooltip text="mostrar serie en el gráfico" />
+                           </tooltip></CheckBox>
+                     </content>
+                  </CustomMenuItem>
+               </items>
+               <tooltip>
+                  <Tooltip text="opciones del sensor" />
+               </tooltip>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </MenuButton>
          </children>
       </AnchorPane>
    </children>

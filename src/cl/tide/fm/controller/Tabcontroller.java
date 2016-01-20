@@ -123,9 +123,19 @@ public class Tabcontroller {
         TemperatureChart.stop();
         ligthChart.stop();
     }
-    public void start(){
-        TemperatureChart.start();
-        ligthChart.start();
+    public void start(long interval){
+        TemperatureChart.start(interval);
+        ligthChart.start(interval);
+    }
+    
+    public void setInterval(long i){
+        TemperatureChart.setInterval(i);
+        ligthChart.setInterval(i);
+    }
+    
+    public void clear(){
+        TemperatureChart.clear();
+        ligthChart.clear();
     }
 
     /**
