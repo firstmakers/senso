@@ -44,16 +44,13 @@ public class SamplingController extends AnchorPane {
         fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/sampling.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
-
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
         listener = new ArrayList<>();
-
-
-        
+ 
         sample.setMaxValue(99999999);
         sample.setMinValue(1);
         sample.setValue(1000);
@@ -76,8 +73,6 @@ public class SamplingController extends AnchorPane {
            listener.stream().forEach((l)->{
                 l.onValuesChange(num);
            });
-        
-        
     }
     
     

@@ -6,6 +6,7 @@ import static cl.tide.fm.controller.ProgramController.getMsToHMS;
 import cl.tide.fm.device.*;
 import cl.tide.fm.model.*;
 import cl.tide.fm.tour.Tour;
+import com.ubidots.*;
 import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
@@ -13,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -24,11 +26,9 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -41,7 +41,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -49,7 +48,7 @@ import org.hid4java.HidDevice;
 
 import org.hid4java.HidException;
 
-public class FXMLController implements Initializable, FmSensoListener {
+public class FXMLController implements Initializable, FmSensoListener, SettingsController.SettingsChange {
 
     FmSenso fmSenso;
     @FXML
@@ -64,20 +63,15 @@ public class FXMLController implements Initializable, FmSensoListener {
     protected Text firmware;
     @FXML
     protected Text info;
-    @FXML Button clearChart;
+    @FXML
+    Button clearChart;
     private ArrayList<SensorView> sensors;
     private Timer programTimer;
     protected Control control;
     private Stage stage;
-    private boolean sampling = false;
-
-    public Stage getStage() {
-        return stage;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
+    private Boolean sampling = false;
+    private SettingsController settings;
+    private Boolean animation = true;
 
     //private ChartController mChart;
     private Tabcontroller mTab;
@@ -86,18 +80,17 @@ public class FXMLController implements Initializable, FmSensoListener {
     private int totalSamples = 0;
     private long userInterval = 1000;
     private int userSamples = 100;
-    private long userProgram = -1;
+    private long userProgram = 0;
+    private Boolean futureSampling;
+    private Boolean closing = false;
+    private UbidotsClient ubidots;
 
     FileManager fm;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        //deviceInfo = new DeviceInfo();
         control = new Control();
-        /*control.samples.setNumber(new BigDecimal(300));
-         control.interval.setNumber(BigDecimal.ONE);    */
-
         control.btnStart.setOnAction((ActionEvent event) -> {
             clickStart();
         });
@@ -107,13 +100,10 @@ public class FXMLController implements Initializable, FmSensoListener {
         control.btnStop.setOnAction((ActionEvent event) -> {
             clickStop();
         });
-        /*control.btnSave.setOnAction((ActionEvent event) -> {
-         clickSave(((Node) event.getTarget()).getScene().getWindow());
-         });*/
         try {
             fmSenso = new FmSenso();
             fmSenso.addFmSensoListener(this);
-            sensors = new ArrayList<>();
+            sensors = new ArrayList<>(6);
         } catch (HidException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -123,18 +113,28 @@ public class FXMLController implements Initializable, FmSensoListener {
             addInternalSensor();
         }
         setStatusDevice(fmSenso.getCurrentDevice());
-        fm = new FileManager(sensors);
 
         clearChart.setOnAction((ActionEvent event) -> {
-            if(mTab!= null)
+            if (mTab != null) {
                 mTab.clear();
+            }
         });
-        
+
         if (fmSenso.isConnected()) {
             configChart();
             fmSenso.start();
         }
+        settings = new SettingsController(getStage());
+        fm = new FileManager(sensors, this);
+        settings.addListener(this);
+
+        futureSampling = SettingsController.getFutureSample();
+
+        configUbibots();
+
     }
+
+
     /*
      *Agrega los sensores internos de la tarjeta senso
      */
@@ -156,35 +156,33 @@ public class FXMLController implements Initializable, FmSensoListener {
     /*
      */
     public void close() {
+        closing = true;
         fmSenso.stop();
         if (mTab != null) {
             mTab.stop();
         }
-        if (programTimer != null) {
-            programTimer.cancel();
-        }
+        cancelTimer();
     }
 
     @Override
     public void onClose() {
-        System.out.println("Closed");
         //mChart.stop();
         clickStop();
+        if(ubidots!=null)
+            ubidots.close();
         firmware.setText("");
-        //mTab.stopCapture();
+        System.out.println("Closed");
     }
 
     @Override
     public void onStart() {
         System.out.println("Start");
         Platform.runLater(() -> {
-
             if (fmSenso.isRunning()) {
                 fmSenso.addFmSensoListener(this);
-
             }
         });
-        //mTab.startCapture();
+ 
     }
 
     /**
@@ -217,6 +215,7 @@ public class FXMLController implements Initializable, FmSensoListener {
             sensorContainer.getChildren().removeAll(sensors);
             sensors.clear();
             System.out.println("Current device Detached ");
+            clear();
         });
         info("Se desconectó el dispositivo ", 2000);
     }
@@ -248,7 +247,7 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     @Override
     public void onSensorDetach(final ArrayList<Sensor> removedList) {
-        System.out.println(removedList.size() + " sensor removed");
+        Platform.runLater(()->{
         String id;
         for (Sensor s : removedList) {
             id = s.getId();
@@ -260,6 +259,10 @@ public class FXMLController implements Initializable, FmSensoListener {
                 }
             }
         }
+        
+        
+        });
+        
     }
 
     /**
@@ -270,8 +273,7 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     @Override
     public void onSensorAttach(ArrayList<Sensor> addedList) {
-
-        System.out.println(addedList.size() + " sensor attached");
+       Platform.runLater(()->{
         SensorView sensor;
         for (Sensor s : addedList) {
             if (s.getProfile() == (TypeSensor.TEMPERATURE)) {
@@ -284,12 +286,14 @@ public class FXMLController implements Initializable, FmSensoListener {
                 sensor = new UnknownView(s);
             }
             sensor.setID(s.getId());
+            sensor.setAnimation(animation);
             sensor.setCustomSerie(new CustomSeries(sensor.getName()));
             sensors.add(sensor);
             addView(sensor);
             mTab.addSensorview(sensor);
-
         }
+       });
+        
     }
 
     /**
@@ -318,10 +322,12 @@ public class FXMLController implements Initializable, FmSensoListener {
             synchronized (sensorContainer) {
                 sensorContainer.getChildren().add(node);
                 //mChart.addSerie(view.getCustomSerie().getSerie());
-                Timeline fadein = new Timeline(
-                        new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
-                        new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
-                fadein.play();
+                if (animation) {
+                    Timeline fadein = new Timeline(
+                            new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 0.0)),
+                            new KeyFrame(new Duration(100), new KeyValue(node.opacityProperty(), 1.0)));
+                    fadein.play();
+                }
                 view.setSerieColor();
             }
         });
@@ -335,12 +341,16 @@ public class FXMLController implements Initializable, FmSensoListener {
             SensorView view = (SensorView) node;
             synchronized (sensorContainer) {
                 //mChart.removeSerie(view.getCustomSerie().getSerie());
+                if(animation){
                 Timeline fade = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(node.opacityProperty(), 1.0)),
                         new KeyFrame(new Duration(200), e -> {
                             sensorContainer.getChildren().remove(node);
                         }, new KeyValue(node.opacityProperty(), 0.0)));
                 fade.play();
+                }else{
+                    sensorContainer.getChildren().remove(node);
+                }
             }
         });
     }
@@ -350,12 +360,17 @@ public class FXMLController implements Initializable, FmSensoListener {
      * no ha sido guardada borra todo su contenido.
      */
     private void clickStart() {
+       
         if (totalSamples > 0 && !pause) {
             clear();
         }
         sampling = true;
         pause = false;
-        fm.setHeader(getHeader());
+        fm.newWorkbook(getHeader());
+        if(ubidots!=null && !pause)
+            ubidots.tryToConnect(sensors);
+        else 
+            System.err.println(ubidots);
         if (fmSenso.isRunning() && userInterval > 999 && userSamples > 0) {
             mTab.start(userInterval);
             /*control.btnSave.setDisable(true);*/
@@ -369,12 +384,53 @@ public class FXMLController implements Initializable, FmSensoListener {
                         return;
                     }
                     totalSamples++;
-                    fm.streamRow(getSamples(), null);
                     updateUI();
+                    fm.streamRow(getSamples(), null);
+                   
                 }
             }, 0, userInterval);
         }
+        System.gc();
     }
+    
+     /**
+     * Pausa una medición que está en curso.
+     */
+    private void clickPause() {
+        control.btnStart.setDisable(false);
+        sampling = false;
+        //control.btnSave.setDisable(false);
+        mTab.stop();
+        if (mTimer != null) {
+            mTimer.cancel();
+            this.pause = true;
+            mTimer = null;
+        }
+        if(totalSamples > 0)
+            info("La medición está pausada, haga clic en iniciar para reanudar", 4000);
+    }
+
+    /**
+     * Detiene una medición que está en curso.
+     */
+    private void clickStop() {
+        sampling = false;
+        control.btnStart.setDisable(false);
+        pause = false;
+        mTab.stop();
+        fm.automaticSave();
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        if(totalSamples>0)
+            info("La medición ha finalizado, haga clic en archivo y luego en guardar.", 5000);
+        if(ubidots != null)
+            ubidots.stopUpdate();
+        /*if(SettingsController.getAllowUbidots() && !SettingsController.getUbidotsApiKey().isEmpty())
+            fm.createDatasource(getHeader());*/
+    }
+
 
     /**
      * Muestra un diálogo cuando existe una medición sin guardar.
@@ -422,7 +478,8 @@ public class FXMLController implements Initializable, FmSensoListener {
         String date = dateFormat.format(d);
         Object[] ob = new Object[sensors.size() + 1];
 
-        for (int i = 0; i < ob.length; i++) {
+        int count = ob.length;
+        for (int i = 0; i < count; i++) {
             ob[i] = date;
             int cellIndex = 1;
             for (SensorView v : sensors) {
@@ -446,38 +503,6 @@ public class FXMLController implements Initializable, FmSensoListener {
         });
     }
 
-    /**
-     * Pausa una medición que está en curso.
-     */
-    private void clickPause() {
-        control.btnStart.setDisable(false);
-        sampling = false;
-        //control.btnSave.setDisable(false);
-        mTab.stop();
-        if (mTimer != null) {
-            mTimer.cancel();
-            this.pause = true;
-            mTimer = null;
-        }
-        if(totalSamples > 0)
-            info("La medición está pausada, haga clic en iniciar para reanudar", 4000);
-    }
-
-    /**
-     * Detiene una medición que está en curso.
-     */
-    private void clickStop() {
-        sampling = false;
-        control.btnStart.setDisable(false);
-        pause = false;
-        mTab.stop();
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-        if(totalSamples>0)
-            info("La medición ha finalizado, haga clic en archivo y luego en guardar.", 5000);
-    }
 
     /**
      * Abre una ventana para guardar una medición.
@@ -495,10 +520,11 @@ public class FXMLController implements Initializable, FmSensoListener {
             //Show save file dialog
             File file = fileChooser.showSaveDialog(win);
             if (file != null) {
-                fm.flush(file.getAbsolutePath());
+                fm.save(file.getAbsolutePath());
                 clear();
             }
         }
+        System.gc();
     }
 
     /**
@@ -507,11 +533,31 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     private void clear() {
         totalSamples = 0;
+        mTab.clear();
         Platform.runLater(() -> {
             control.sampleText.setText("0/0");
             control.progressBar.setProgress(0.0);
         });
     }
+    
+    
+    public Boolean getAnimation() {
+        return animation;
+    }
+
+    public void setAnimation(Boolean animation) {
+        this.animation = animation;
+        sensors.forEach((s)->{s.setAnimation(animation);});
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
 
     /**
      * Asigna la versión del firmware de la tarjeta conectada.
@@ -550,12 +596,23 @@ public class FXMLController implements Initializable, FmSensoListener {
             menuHundredSamples;
 
     @FXML
-    private MenuItem menuCustomInterval,
-            menuCustomSample;
+    private MenuItem menuSettings;
+    
+    /**
+     * Abre La ventana de configuración.
+     * @param event evento del menú configuración.
+     */
+    public void openSettings(ActionEvent event){
+       settings.show();
+       settings.setSelected(SettingsController.GENERAL_SETTINGS);
+       /*settings.setCurrentInterval(userInterval);
+       settings.setCurrentFutureSampling();
+       settings.setCurrentSamples();*/
+
+    }
 
     /**
      * Abre una venta donde se obtiene una ruta para guardar una medición.
-     *
      * @param event Evento onAction del menú guardar
      */
     public void handleMenuSave(ActionEvent event) {
@@ -581,26 +638,26 @@ public class FXMLController implements Initializable, FmSensoListener {
         if (menuItem instanceof CheckMenuItem) {
             switch (((CheckMenuItem) menuItem).getId()) {
                 case "menuOneSecond":
-                    setInterval(1000);
+                    settings.setInterval(1000);
                     menuOneMin.setSelected(false);
                     menuTenSeconds.setSelected(false);
                     menuThirtySeconds.setSelected(false);
                     break;
                 case "menuTenSeconds":
-                    setInterval(10000);
+                    settings.setInterval(10000);
                     menuOneMin.setSelected(false);
                     menuOneSecond.setSelected(false);
                     menuThirtySeconds.setSelected(false);
                     break;
                 case "menuThirtySeconds":
-                    setInterval(30000);
+                    settings.setInterval(30000);
                     menuOneMin.setSelected(false);
                     menuTenSeconds.setSelected(false);
                     menuOneSecond.setSelected(false);
                     break;
 
                 case "menuOneMin":
-                    setInterval(60000);
+                    settings.setInterval(60000);
                     menuOneSecond.setSelected(false);
                     menuTenSeconds.setSelected(false);
                     menuThirtySeconds.setSelected(false);
@@ -629,18 +686,18 @@ public class FXMLController implements Initializable, FmSensoListener {
                 case "menuHundredSamples":
                     menuTenThousandSamples.setSelected(false);
                     menuOneThousandSamples.setSelected(false);
-                    setUserSample(100);
+                    settings.setSamples(100);
 
                     break;
                 case "menuOneThousandSamples":
                     menuTenThousandSamples.setSelected(false);
                     menuHundredSamples.setSelected(false);
-                    setUserSample(1000);
+                    settings.setSamples(1000);
                     break;
                 case "menuTenThousandSamples":
                     menuOneThousandSamples.setSelected(false);
                     menuHundredSamples.setSelected(false);
-                    setUserSample(10000);
+                    settings.setSamples(10000);
                     break;
                 default:
                     break;
@@ -656,12 +713,11 @@ public class FXMLController implements Initializable, FmSensoListener {
      * Asigna no seleccionado al menú de muestras.
      */
     public void setUnchecked(boolean b) {
-        if(b){
-        menuHundredSamples.setSelected(false);
-        menuTenThousandSamples.setSelected(false);
-        menuOneThousandSamples.setSelected(false);
+        if (b) {
+            menuHundredSamples.setSelected(false);
+            menuTenThousandSamples.setSelected(false);
+            menuOneThousandSamples.setSelected(false);
         }
-        
         menuOneSecond.setSelected(false);
         menuTenSeconds.setSelected(false);
         menuThirtySeconds.setSelected(false);
@@ -673,105 +729,41 @@ public class FXMLController implements Initializable, FmSensoListener {
      * número de muestras.
      */
     private void showSettingSampling() {
-        Stage dialog = new Stage();
-        //ventana modal
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(stage);
-        dialog.setTitle("configuración de muestras");
-        SamplingController spc = new SamplingController();
-        spc.setCurrentSetting((int)userSamples);
-
-        Scene dialogScene = new Scene(spc);
-        dialogScene.getStylesheets().add("/styles/Styles.css");
-        dialog.setScene(dialogScene);
-        dialog.setMinWidth(400.0);
-        dialog.setMinHeight(180);
-        dialog.setMaxWidth(400);
-        dialog.setMaxHeight(180);
-        dialog.show();
-        spc.cancel.setOnAction((ActionEvent event) -> {
-            dialog.close();
-        });
-        spc.addListener((int samples) -> {
-            setUserSample(samples);
-            dialog.close();
-        });
+        settings.show();
+        settings.setSelected(SettingsController.SAMPLE_SETTINGS);
+        
     }
- /**
+
+    /**
      * Abre una ventana donde se puede configurar el intervalo de medición y el
      * número de muestras.
      */
     private void showSettingInterval() {
-        Stage dialog = new Stage();
-        //ventana modal
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(stage);
-        dialog.setTitle("configuración");
-        IntervalController stc = new IntervalController();
-        stc.setCurrentSetting(userInterval);
-
-        Scene dialogScene = new Scene(stc);
-        dialogScene.getStylesheets().add("/styles/Styles.css");
-        dialog.setScene(dialogScene);
-        dialog.setMinWidth(400.0);
-        dialog.setMinHeight(180);
-        dialog.setMaxWidth(400);
-        dialog.setMaxHeight(180);
-        dialog.show();
-        stc.cancel.setOnAction((ActionEvent event) -> {
-            dialog.close();
-        });
-        stc.addListener((long interval) -> {
-            setInterval(interval);
-            dialog.close();
-        });
+        settings.show();
+        settings.setSelected(SettingsController.INTERVAL_SETTINGS);
+        
     }
+
     /**
      * Abre la ventana para programar una medición futura.
      *
      * @param event Evento
      */
     public void openProgram(ActionEvent event) {
-        Stage dialog = new Stage();
-        //ventana modal
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(stage);
-        dialog.setTitle("Programar medición");
-        ProgramController pgc = new ProgramController();
-        Scene dialogScene = new Scene(pgc);
-        dialog.setScene(dialogScene);
-        dialogScene.getStylesheets().add("/styles/Styles.css");
-        dialog.show();
-
-        if (userProgram > 0) {
-            pgc.setCurrentProgram(userProgram);
-        }
-        pgc.cancel.setOnAction((ActionEvent e) -> {
-            if (programTimer != null) {
-                programTimer.cancel();
-                userProgram = -1;
-                info("Se ha cancelado la programación de la medición", 2000);
-            }
-            pgc.cancelTimer();
-            dialog.close();
-        });
-        pgc.ok.setOnAction((ActionEvent e) -> {
-            pgc.cancelTimer();
-            dialog.close();
-        });
-        pgc.addListener(programEvent);
+        settings.show();
+        settings.setSelected(SettingsController.PROGRAM_SETTINGS);
     }
-
-    /**
-     * Listener de la ventana de programación, maneja el evento para programar
-     * el inicio de cada medición.
-     *
-     * @param programInMs tiempo en milisegundos.
-     */
-    ProgramController.ProgramListener programEvent = (long programInMS) -> {
-        userProgram = programInMS;
+    private  void cancelTimer(){
+        if (programTimer != null) {
+            programTimer.purge();
+            programTimer.cancel();
+            programTimer = null;
+        }
+    }
+    private void initTimerFutureSmapling() {
         if (programTimer != null) {
             programTimer.cancel();
+            programTimer = null;
         }
         programTimer = new Timer();
         programTimer.scheduleAtFixedRate(new TimerTask() {
@@ -789,44 +781,55 @@ public class FXMLController implements Initializable, FmSensoListener {
                     if (current >= userProgram) {
                         //
                         clickStart();
-                        userProgram = -1;
+                        settings.setFutureSample(false);
                         programTimer.cancel();
                     }
                 }
             }
         }, 0, 1000);
-    };
+    }
 
     /**
      * Muestra un mensaje.
-     *
      * @param msg mensaje
      * @param duration duración del mensaje en milisegundos
      */
-    private void info(String msg, long duration) {
+    public void info(String msg, long duration) {
+        if(!closing){
         Platform.runLater(() -> {
             info.setText(msg);
-            if (info.getOpacity() == 0.0) {
-                FadeTransition fadein = new FadeTransition(new Duration(100), info);
-                fadein.setFromValue(0.0);
-                fadein.setToValue(1.0);
-                fadein.play();
+            if(info.getOpacity()== 0.0) {
+                if(animation){
+                    FadeTransition fadein = new FadeTransition(new Duration(300), info);
+                    fadein.setFromValue(0.0);
+                    fadein.setToValue(1.0);
+                    fadein.play();
+                }
+                else
+                    info.setOpacity(1.0);
             }
             if (duration > 10) {
                 Timer t = new Timer();
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        FadeTransition fade = new FadeTransition(new Duration(200), info);
-                        fade.setFromValue(1.0);
-                        fade.setToValue(0.0);
-                        fade.play();
-                        t.cancel();
+                        if (animation) {
+                            FadeTransition fade = new FadeTransition(new Duration(300), info);
+                            fade.setFromValue(1.0);
+                            fade.setToValue(0.0);
+                            fade.play();   
+                        }
                         t.purge();
+                        t.cancel();
+                        info.setText("");
                     }
                 }, duration);
             }
         });
+        }
+        else{
+            System.out.print("closing "+ true);
+        }
     }
 
     /**
@@ -834,7 +837,9 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     private void setInterval(long i) {
         userInterval = i;
-        mTab.setInterval(i);
+        if (mTab != null) {
+            mTab.setInterval(i);
+        }
         if (mTimer != null && !pause) {
             clickPause();
             clickStart();
@@ -846,5 +851,84 @@ public class FXMLController implements Initializable, FmSensoListener {
      */
     private void setUserSample(int s) {
         userSamples = s;
+    }
+
+    /**
+     * @param event evento que contiene los cambios
+     */
+    @Override
+    public void onSettingsChanged(SettingsEvent event) {
+
+        if (event.interval != userInterval) {
+            setInterval(event.interval);
+        }//
+
+        if (event.samples != userSamples) {
+            setUserSample(event.samples);
+        }//
+
+        if (!Objects.equals(event.isAnimationAvailable, animation)) {
+            setAnimation(event.isAnimationAvailable);
+
+        }//
+
+        if (!Objects.equals(event.isSaveAllAvailable, fm.saveAll)) {
+            fm.saveAll = event.isAnimationAvailable;
+            if (event.isSaveAllAvailable) {
+                if (!event.currentWorkspace.equals(fm.workspace)) {
+                    fm.workspace = event.currentWorkspace;
+                }
+            }
+        }//
+
+        futureSampling = event.isAvailableFutureSampling;
+        if (futureSampling) {
+            userProgram = event.futureSamplingMs;
+            initTimerFutureSmapling();
+        } 
+        else{
+            if(programTimer!=null){
+                cancelTimer();
+                info("Se ha cancelado la programación de la medición", 2000);
+            }
+        }
+        
+        if(event.isAllowUbidots && ubidots == null){
+            configUbibots();
+        }
+
+    }
+
+    private void configUbibots() {
+        if(ubidots!=null)
+            ubidots.close();
+        ubidots = null;
+        if (SettingsController.getAllowUbidots()) {
+            ubidots = new UbidotsClient(SettingsController.getUbidotsApiKey());
+            ubidots.addListener(new UbidotsClient.UbidotsEvent() {
+                @Override
+                public void isOnline(boolean status) {
+                    System.out.println("Ubidots online...");
+                    if(status)
+                        info("El servidor ubidots está online", 1000);
+                    else
+                        info(UbidotsClient.NET_ERROR, 1000);
+                }
+
+                @Override
+                public void onErrorOcurred(String error) {
+                    System.out.println(error);
+                    if(error.equals(UbidotsClient.NET_ERROR)){
+                        info(error,0);
+                        ubidots.stopUpdate();
+                    }       
+                }
+
+                @Override
+                public void onStop() {
+                    System.out.println("onStop");
+                }
+            });
+        }
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -51,11 +52,12 @@ public class CustomSeries {
     }
 
     public String getName() {
-        return name;
+        return serie.getName();
     }
-
+    
     public void setName(String name) {
-        this.name = name;
+        this.serie.setName(name);
+  
     }
 
     public List<XYChart.Data<String, Double>> getData() {

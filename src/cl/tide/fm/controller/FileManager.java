@@ -5,9 +5,15 @@ package cl.tide.fm.controller;
 
 
 import cl.tide.fm.components.SensorView;
+import cl.tide.fm.utilities.AsyncTask;
+import com.ubidots.*;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +41,9 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
  * @author Edison Delgado
  */
 public class FileManager {
+    
+    private ApiClient ubidots;
+    private DataSource dataSource;
     /*Libro Excel*/
     SXSSFWorkbook workbook;
     /*Hoja de cálculo*/
@@ -47,14 +56,28 @@ public class FileManager {
     int indexRow;
     /* Lista que contiene los sensores conectados, (no se usa)*/
     List<SensorView> samples;
+    public String workspace; 
+    public Boolean saveAll = false;
+    String [] header; 
+    private final FXMLController controller;
 
+    private boolean isOnline = false;
+    private String lastFile = "";
     /*
     * Constructor
     */
-    public FileManager(ArrayList<SensorView> s){
+    public FileManager(ArrayList<SensorView> s, FXMLController controller){
+        this.controller = controller;
         this.samples = s;
         create();
+       // boolean allowUbidots = SettingsController.getAllowUbidots();
+        //String apikey = SettingsController.getUbidotsApiKey();
+        /*if (allowUbidots && !apikey.isEmpty()) 
+            ubidots = new ApiClient(apikey);*/
+        
+        
     }
+    private Variable[] helperVariable;
    
     /*
     * Crea una nueva instancia de un documento excel, reinicia el contador 
@@ -63,7 +86,9 @@ public class FileManager {
     public void create(){
         workbook= new SXSSFWorkbook(10);
         sheet = workbook.createSheet("Senso");  
-        indexRow = 0;         
+        indexRow = 0; 
+        
+
     }
     /*
     * Exporta un objeto lista a excel, recomendado para archivos con pocas filas
@@ -148,15 +173,7 @@ public class FileManager {
         return cs;
     }
     
-    /*
-    * Asigna la cabecera del documento y su estilo
-    */
-    public void setHeader(String[] header) {
-        if(indexRow == 0){
-            streamRow(header, getHeaderStyle(workbook));          
-        }
-    }
-    
+
     /*
     * Sobre el archivo creado crea una nueva fila de datos
     */
@@ -165,10 +182,13 @@ public class FileManager {
             row = sheet.createRow(indexRow);
             for(int i=0;i<length;i++){
                 Cell c = row.createCell(i);
-                if(ob[i] instanceof Double)
-                    c.setCellValue(new Double(ob[i].toString()));
-                else
+                if(ob[i] instanceof Double){
+                    Double value = new Double(ob[i].toString());
+                    c.setCellValue(value);
+                }
+                else{
                     c.setCellValue(ob[i].toString());
+                }
                 if(style != null){
                     c.setCellStyle(style);
                     sheet.autoSizeColumn(i);
@@ -184,7 +204,14 @@ public class FileManager {
     * Cierra el archivo y lo guarda en la ruta seleccionada por el usuario.
     * @params path: ruta absoluta del archivo.
     */
-    public void flush(String path) {
+    public void save(String path) {
+    if(indexRow == 0 && saveAll){
+        try{
+            Files.copy(new File(lastFile).toPath(), new File(path).toPath());
+        }catch(IOException e){    
+        }
+    }
+    else{
     try {
         out = new FileOutputStream(path);
         workbook.write(out);
@@ -192,7 +219,75 @@ public class FileManager {
         create();
         } catch (Exception ex) {
             Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-        }        
+        } 
     }
+    lastFile = path;
+    }
+
+
+    public void newWorkbook(String[] header) {
+        helperVariable = null;
+        this.header = header;
+        if (indexRow == 0) {
+            streamRow(header, getHeaderStyle(workbook));
+            //Ubidots     
+        }
+        /*if (SettingsController.getAllowUbidots()) {
+            PrepareUbidots task = new PrepareUbidots(controller);
+            task.execute();
+            System.err.println("Lanzando ubidots");
+        }*/
+    }
+
+    public void automaticSave(){
+        if(saveAll && indexRow > 0){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
+            String dateString = LocalDateTime.now().format(formatter);
+            new File(workspace).mkdir();
+            save(workspace+File.separator+dateString+".xlsx");
+        }
+    }  
     
+    
+    class PrepareUbidots extends AsyncTask{
+        FXMLController ctrl;
+        public PrepareUbidots(FXMLController ctrl){
+            this.ctrl = ctrl;
+        }
+
+        @Override
+        public void onPreExecute() {
+            ctrl.info("Preparando estructura de datos para ubidots", 0);
+            
+        }
+
+        @Override
+        public void doInBackground() {  
+            isOnline = false;
+            if(ubidots == null)
+                ubidots = new ApiClient(SettingsController.getUbidotsApiKey());
+            dataSource = ubidots.createDataSource("Senso");
+                helperVariable = new Variable[header.length-1];
+                for (int i = 0; i < helperVariable.length; i++) {
+                    helperVariable[i] = dataSource.createVariable(header[i+1]);
+                    //ctrl.info("Preparando variable de "+header[i], 0);
+            }
+        }
+
+        @Override
+        public void onPostExecute() {
+            //ctrl.info("Configuración Ubidots lista", 0);
+            if( helperVariable!= null && helperVariable.length > 0)
+                isOnline = true;
+            else
+                isOnline = false;
+            
+            System.out.println("Post Execute");
+        }
+
+        @Override
+        public void progressCallback(Object... params) {
+            
+        }
+    }
 }

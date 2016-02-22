@@ -5,18 +5,13 @@
  */
 package cl.tide.fm.utilities;
 
-import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -45,11 +40,27 @@ public class IntegerField extends TextField {
      private int minValue;
      private int maxValue;
      private int maxLength;
-  
- 
+     protected ValueChange listener;
+
+    public void addListener(ValueChange l) {
+        listener = l;
+    }
+
     // expose an integer value property for the text field.
-    public int  getValue()                 { return value.getValue(); }
-    public void setValue(int newValue)     { value.setValue(newValue); this.setText(String.format("%02d", newValue)); }
+    public int getValue() {
+        return value.getValue();
+    }
+
+    public void setValue(int newValue) {
+        this.setText(String.format("%02d", newValue));
+        if (newValue != getValue()) {
+            value.setValue(newValue);
+            if (listener != null) {
+                listener.onChange(newValue);
+            }
+        }
+    }
+    
     public IntegerProperty valueProperty() { return value; }
 
     public IntegerField() {
@@ -86,12 +97,12 @@ public class IntegerField extends TextField {
           } else {
               int mValue = newValue.intValue();
               if (mValue < intField.minValue) {
-                  this.value.setValue(intField.minValue);
+                  setValue(intField.minValue);
                   return;
               }
               
               if (mValue > intField.maxValue) {
-                  this.value.setValue(intField.maxValue);
+                  setValue(intField.maxValue);
                   return;
               }
               
@@ -117,13 +128,13 @@ public class IntegerField extends TextField {
           String regex = "^[0-9]+$"; //solo numeros
           
           if( !newValue.matches(regex) || newValue.isEmpty() || newValue.length() > maxLength+1){
-               textProperty().setValue( getValue()+"");
+              setValue( getValue());
               return;
           }
           final int intValue = Integer.parseInt(newValue);
  
           if (intField.minValue > intValue || intValue > intField.maxValue) {
-              textProperty().setValue(getValue()+"");
+              setValue(getValue());
               return;
           }
           setValue(intValue);
@@ -131,6 +142,10 @@ public class IntegerField extends TextField {
       //reemplaza el menu contextual por uno vacio
       this.setContextMenu(new ContextMenu());
 
+    }
+    
+    public interface ValueChange{
+        public void onChange(int value);
     }
     
 }

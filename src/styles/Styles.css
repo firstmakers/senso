@@ -15,7 +15,7 @@
 .background, .background-device, .tabPane, .chartContainer, .tabContainer, .value ,.unit, .btn {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 2, 0, 0, 2);
 }
-.logo,.icon, .chart-series-line{
+.logo,.icon, .chart-series-line {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 1, 0, 0, 1);
 }
 
@@ -67,11 +67,11 @@
 }
 .tab:top 
 {
+    -fx-background-color: #A0A0A0;
     -fx-font-weight: bold;
     -fx-focus-color: transparent;
-    -fx-background-insets: 0, 1 1 0 1, 2 2 0 2;
-    -fx-background-radius: 5 5 0 0, 5 5 0 0, 4 4 0 0, 3 3 0 0;
-    -fx-background-color: gray;
+    -fx-background-radius: 10 10 0 0;
+    
 }
 .tab:right 
 {
@@ -92,14 +92,14 @@
 }
 .tab:selected 
 {
--fx-background-color: #e69227;
-/*-fx-background-color: -fx-tab-border-color, -fx-inner-border, -fx-body-color;
--fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
--fx-background-insets: 0, 1 1 0 1, 2 2 0 2;*/
+-fx-background-color: #606060;
+/*-fx-background-color: -fx-tab-border-color, -fx-inner-border, -fx-body-color;*/
+-fx-background-insets: 0, 1 1 0 1, 2 2 0 2;
 -fx-inner-border: 0;
 -fx-focus-color: transparent;
 -fx-background-insets: 0;
--fx-background-radius: 5 5 0 0, 5 5 0 0, 4 4 0 0, 3 3 0 0;
+-fx-background-radius: 10 10 0 0;
+ 
 }
 .tab:disabled 
 {
@@ -114,7 +114,7 @@
 {
 -fx-background-color: transparent;
 -fx-outer-border: null; 
--fx-inner-border: null;
+-fx-inner-border: 2x solid black;
 /*-fx-effect: innershadow(two-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 0);*/
 }
 /*.tab-pane *.tab-header-area {*/
@@ -213,14 +213,12 @@
 -fx-background-radius: 5 5 0 0, 4 4 0 0;
 }*/
 
-.chart-legend {
+/*.chart-legend {
    -fx-background-color:  transparent;
    -fx-padding: 20px;
-}
+}*/
  
-.chart-legend-item-symbol{
-   -fx-background-radius: 0;
-}
+
 .axis-label {
   -fx-text-fill: #635e98;
 }
@@ -413,7 +411,7 @@
 }*/
 
 
-#twopoint, #twopoint2{
+#twopoint, #twopoint2, #twopoint3, #twopoint4{
     -fx-font-size: 15pt;
 }
 #programcnt{

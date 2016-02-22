@@ -159,20 +159,23 @@ public void start() {
         } 
     }
    
-
     public void stop() {
         if (running) {
             running = false;
             writer.cancel();
+
             synchronized (this) {
-                mListener.stream().forEach((l) -> {l.onClose();});
+                mListener.stream().forEach((l) -> {
+                    l.onClose();
+                });
             }
+
             stopReporter();
             sensorManager.clear();
             writer = null;
         }
     }
-    
+
     private void processExternalSensor(byte[] data) {
         byte[] id = new byte[8];
         byte[] sample = new byte[2];

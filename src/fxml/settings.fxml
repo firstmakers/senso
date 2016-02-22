@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import cl.tide.fm.utilities.*?>
+
+<fx:root id="AnchorPane" prefHeight="320.0" prefWidth="600.0" style="-fx-background-color: lightgray;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane fx:id="tabPaneSetting" layoutX="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="600.0" style="-fx-background-radius: 10px;" styleClass="tabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <tabs>
+          <Tab id="tabSetting" closable="false" text="Configuración">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="270.0" prefWidth="600.0">
+                     <children>
+                        <CheckBox fx:id="cbxanimation" layoutX="52.0" layoutY="54.0" mnemonicParsing="false" text="Usar Animaciones" />
+                        <CheckBox fx:id="cbxsaveall" layoutX="52.0" layoutY="79.0" mnemonicParsing="false" text="Guardar siempre una copia de los datos capturados en:" />
+                        <TextField fx:id="workspace" layoutX="52.0" layoutY="106.0" prefHeight="27.0" prefWidth="398.0" />
+                        <Button fx:id="btnworkspace" layoutX="458.0" layoutY="105.0" mnemonicParsing="false" onAction="#selectWorkspace" prefHeight="27.0" prefWidth="102.0" text="Ruta" AnchorPane.rightAnchor="40.0" />
+                        <Separator layoutX="52.0" layoutY="33.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
+                        <Label layoutX="40.0" layoutY="23.0" text="Configuración general" />
+                        <Label layoutX="40.0" layoutY="143.0" text="Datos en línea (se requiere conexión a internet)" />
+                        <Separator layoutX="51.0" layoutY="159.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="159.0" />
+                        <TextField fx:id="apikey" layoutX="52.0" layoutY="199.0" prefHeight="27.0" prefWidth="398.0" />
+                        <Hyperlink fx:id="linkaccount" layoutX="435.0" layoutY="139.0" onAction="#openLink" text="(Crear una cuenta)" />
+                        <CheckBox fx:id="cbxubidots" layoutX="52.0" layoutY="171.0" mnemonicParsing="false" text="Enviar datos a Ubidots, ingrese su APIKEY a continuación:" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab id="tabSample" closable="false" text="Muestras">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="40.0" layoutY="23.0" text="Número de muestras:" />
+                        <Separator layoutX="52.0" layoutY="40.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
+                        <IntegerFieldSample fx:id="sample" alignment="CENTER_RIGHT" layoutX="40" layoutY="60" prefHeight="27" prefWidth="145" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+          <Tab id="tabInterval" text="Intervalo">
+              <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <children>
+                          <Separator prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
+                          <Label layoutX="40.0" layoutY="23.0" text="Intervalo entre muestras:" />
+                          <IntegerField fx:id="hour" alignment="CENTER" layoutX="40" layoutY="60" prefHeight="27" prefWidth="45" />
+                          <IntegerField fx:id="minute" alignment="CENTER" layoutX="87" layoutY="60" prefHeight="27" prefWidth="45" />
+                          <IntegerField fx:id="second" alignment="CENTER" layoutX="133.0" layoutY="60" prefHeight="27" prefWidth="45" />
+      
+                          <Label fx:id="twopoint" layoutX="84" layoutY="60" text=":" />
+                          <Label fx:id="twopoint2" layoutX="130" layoutY="60" text=":" />
+                        <Label layoutX="195.0" layoutY="70.0" text="hh:mm:ss">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                      </children>
+                  </AnchorPane>
+              </content>
+          </Tab>
+            <Tab id="tabProgram" text="Programar inicio">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Separator prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
+                        <Label layoutX="40.0" layoutY="23.0" text="Programar el inicio de una medición:" />
+                          <IntegerField fx:id="programHour" alignment="CENTER" layoutX="40" layoutY="60" prefHeight="27" prefWidth="45" />
+                          <IntegerField fx:id="programMinute" alignment="CENTER" layoutX="87" layoutY="60" prefHeight="27" prefWidth="45" />
+                          <IntegerField fx:id="programSecond" alignment="CENTER" layoutX="133.0" layoutY="60" prefHeight="27" prefWidth="45" />
+      
+                          <Label fx:id="twopoint3" layoutX="84" layoutY="60" text=":" />
+                          <Label fx:id="twopoint4" layoutX="130" layoutY="60" text=":" />
+                        <CheckBox fx:id="cbxfuturesamples" layoutX="370.0" layoutY="60.0" mnemonicParsing="false" text="Activar Inicio Programado" />
+                        <Label fx:id="lbtimer" layoutX="40.0" layoutY="153.0" prefHeight="17.0" prefWidth="514.0" textFill="#606060" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="130.0" />
+                        <Label layoutX="195.0" layoutY="70.0" text="hh:mm:ss">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Button fx:id="btnOk" layoutX="516.0" layoutY="230.0" mnemonicParsing="false" prefWidth="120.0" text="Listo" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />
+   </children>
+</fx:root>

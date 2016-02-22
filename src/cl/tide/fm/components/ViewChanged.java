@@ -6,7 +6,6 @@
 package cl.tide.fm.components;
 
 import cl.tide.fm.model.CustomSeries;
-import cl.tide.fm.model.Sensor;
 
 /**
  *
@@ -15,5 +14,6 @@ import cl.tide.fm.model.Sensor;
 public interface ViewChanged {
  
     public void changed(boolean visible, CustomSeries customSerie, Boolean newValue);
- 
 }
+
+

@@ -5,8 +5,10 @@
  */
 package cl.tide.fm.components;
 
+import cl.tide.fm.controller.SettingsController;
 import cl.tide.fm.model.CustomSeries;
 import cl.tide.fm.model.Sensor;
+import com.ubidots.Variable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ import javafx.util.Duration;
  *
  * @author Edison Delgado
  */
-public class SensorView extends VBox{
+public class SensorView extends VBox {
     
     @FXML public Text decimal;
     @FXML public Text integer;
@@ -54,6 +56,11 @@ public class SensorView extends VBox{
     private List<ViewChanged> listener;
     private boolean serieVisibility;
     private boolean animation;
+    private List<ViewNameChanged> nameListener;
+    protected float[] data;
+    private String UbidotsID;
+    private Variable  ubidotsVariable;
+
 
     /**
      *
@@ -74,10 +81,14 @@ public class SensorView extends VBox{
            Color oldColor = getColor();
            setColor(colorPicker.getValue());
            Color newColor = getColor();
-           animateBackground(background, oldColor, newColor);
+           if(animation) animateBackground(background, oldColor, newColor);
            setBackgroundColor(newColor);
            setSerieColor();
+           if(nameListener!=null && nameListener.size()>0){
+               nameListener.forEach((l)->{l.onNameSensorChange(getName(), "");});
+           }
         });
+       nameListener = new ArrayList<>();
        listener = new ArrayList<>();
        cbx.setSelected(true);
        serieVisibility = true;
@@ -88,11 +99,19 @@ public class SensorView extends VBox{
                if(newValue)
                    setSerieColor();
            }          
-        });
-       animation = true;
+        });       
        
+       name.textProperty().addListener((observable, oldValue, newValue)->{
+           if(customSerie!= null){
+               customSerie.setName(newValue);
+               System.out.println("nuevo nombre "+ newValue);
+               if(nameListener!=null)
+                   nameListener.forEach((l)->{l.onNameSensorChange(newValue, oldValue); });   
+           }
+       });
+       //UbidotsID = SettingsController.getUbidotsVariable(getID());     
     }
-    
+
     /*
     * Anima el color de una figura, se utiliza para animar el 
     * fondo de los sensores cuando cambian de color.
@@ -120,31 +139,42 @@ public class SensorView extends VBox{
             this.listener.add(listener);
     }
     
-    /*
-    * Aplica el color actual del sensor a la serie del gráfico
-    */
-    public void setSerieColor(){
-        String rgb = String.format("%d, %d, %d",
-        (int) (color.getRed() * 255),
-        (int) (color.getGreen() * 255),
-        (int) (color.getBlue() * 255));
-        try{
-        Node node = getCustomSerie().getSerie().getNode();
-        if(node != null)
-            node.setStyle("-fx-stroke: rgb("+rgb+", 1.0);");
-        }catch(Exception e){
-            System.out.println("exception "+ e.getMessage());
-        }
+    public void addListener(ViewNameChanged listener){
+        if(!this.nameListener.contains(listener))
+            this.nameListener.add(listener);
     }
     
-    public void setValue(String value) {
-        if(animation){   
-            //animateText(integer, 1.0, 0.0);
-            integer.setText(value.concat("."));
-            animateText(integer, 0.0, 1.0);  
-        }else{
-            integer.setText(value.concat("."));
+    public void removeListener(ViewChanged listener){
+        this.listener.remove(listener);
+    }
+    
+    public void removeListener(ViewNameChanged listener){
+         boolean x = this.nameListener.remove(listener);
+         System.err.println(x==true? "Removido "+listener :"No existe "+ listener);
+    }
+    /*
+     * Aplica el color actual del sensor a la serie del gráfico
+     */
+    public void setSerieColor() {
+        String rgb = String.format("%d, %d, %d",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
+        try {
+
+            Node node = getCustomSerie().getSerie().getNode();
+            if (node != null) {
+                node.setStyle("-fx-stroke: rgb(" + rgb + ", 1.0); -fx-background-color:rgb(" + rgb + ", 1.0); ;");
+            }
+        } catch (Exception e) {
+            System.out.println("exception " + e.getMessage());
         }
+    }
+
+    public void setValue(String value) {
+        if(animation)  
+            animateText(integer, 0.0, 1.0);  
+        integer.setText(value.concat("."));
     }
     
     public void setIcon(Image img){
@@ -166,15 +196,12 @@ public class SensorView extends VBox{
     public void setID(String ID) {
         this.ID = ID;
     }
-    public void setDecimal(String t){
-        if(animation){     
-            //animateText(decimal, 1.0, 0.0);
-            decimal.setText(t);   
+    public void setDecimal(String t) {
+        if (animation) 
             animateText(decimal, 0.0, 1.0);
-        }else{
-            decimal.setText(t);
-        }
+        decimal.setText(t);
     }
+    
     public void setUnit(String t){
         this.unit.setText(t);
     }
@@ -184,7 +211,9 @@ public class SensorView extends VBox{
     }
 
     public void setName(String name) {
+        System.err.println("name changed "+ name);
         this.name.setText(name);
+
     }
 
     public Color getColor() {
@@ -221,4 +250,31 @@ public class SensorView extends VBox{
     public void setSerieVisibility(boolean serieVisibility) {
         this.serieVisibility = serieVisibility;
     }  
+
+    public boolean isAnimation() {
+        return animation;
+    }
+
+    public void setAnimation(boolean animation) {
+        this.animation = animation;
+    }
+    public String getUbidotsID() {
+        return UbidotsID;
+    }
+
+    public void setUbidotsID(String UbidotsID) {
+        this.UbidotsID = UbidotsID;
+    }
+    
+    public interface ViewNameChanged{
+        public void onNameSensorChange(String newValue, String oldValue);
+    }
+    public Variable getUbidotsVariable() {
+        return ubidotsVariable;
+    }
+
+    public void setUbidotsVariable(Variable ubidotsVariable) {
+        this.ubidotsVariable = ubidotsVariable;
+    }
+   
 }

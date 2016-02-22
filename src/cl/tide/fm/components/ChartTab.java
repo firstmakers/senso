@@ -10,17 +10,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.effect.Glow;
+import javafx.scene.effect.Reflection;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * Muestra y controla la vista del gráfico que se asigna a un Tab,
@@ -48,7 +55,7 @@ public class ChartTab {
         lineChart = new LineChart<>(xAxis,yAxis);
         lineChart.setTitle(title);
         lineChart.setCreateSymbols(false);//remove symbols 
-        lineChart.setLegendVisible(false);
+        lineChart.setLegendVisible(true);
         lineChart.getXAxis().setAutoRanging(true);
         lineChart.getXAxis().setTickMarkVisible(false);
         lineChart.setAnimated(false);
@@ -63,17 +70,26 @@ public class ChartTab {
         });
     }
     
-    /*Agrega un nuevo sensor*/
+    /**
+     * Agrega un nuevo sensor.
+     */
     public void addSensorview(SensorView s){
         Platform.runLater(()->{
-            addSerie(s.getCustomSerie().getSerie());
             sensors.add(s);
+            addSerie(s.getCustomSerie().getSerie());
             s.setSerieColor();
+            setLegendColor();
+            s.addListener((String newValue, String oldValue) -> {
+                setLegendColor();
+            });
         });
-
     }
     
-    /*Elimina un sensor del gráfico*/
+
+    
+    /**
+     * Elimina un sensor del gráfico.
+     */
     public void removeSensorview(SensorView s){
         Platform.runLater(()->{
             removeSerie(s.getCustomSerie().getSerie());
@@ -81,24 +97,36 @@ public class ChartTab {
         });
     }
     
-    /*Asigna una etiqueta al eje Y del gráfico*/
+    /**
+     * Asigna una etiqueta al eje Y del gráfico.
+     * @param label
+     */
     public void setYAxisLabel(String label){
         yAxis.setLabel(label);
     }
-    /*Asigna una etiqueta al eje X del gráfico*/
+    /**
+     * Asigna una etiqueta al eje X del gráfico.
+     * @param label etiqueta
+     */
     public void setXAxisLabel(String label){
         xAxis.setLabel(label);
     }
-    /*Agrega una serie al gráfico*/
+    /**
+     * Agrega una serie al gráfico.
+     * @param serie
+     */
     public void addSerie(XYChart.Series serie){
         lineChart.getData().add(serie);
     }
-    /*Elimina una serie del gráfico*/
+    /**
+     * Elimina una serie del gráfico.
+     * @param serie
+     */
     public void removeSerie(XYChart.Series serie){
         lineChart.getData().remove(serie);
     }
     
-    /*
+    /**
         Grafica según el intervalo definido por el usuario 
         todos los sensores que están agregados. Por defecto se muestran los últimos 
         50 registros
@@ -126,8 +154,27 @@ public class ChartTab {
         }, 0, interval);
     }
     
-    /*
-        Menú contextual que se despliega haciendo clic derecho sobre el gráfico
+    /**
+     * Asigna el color de la leyenda del gráfico, 
+     * corresponde al color de su serie.
+     **/
+    public void setLegendColor() {
+        int i = 0;
+        Set<Node> items = lineChart.lookupAll("Label.chart-legend-item");
+        for (Node item : items) {
+            Label legend = (Label) item;
+            Color color = sensors.get(i).getColor();
+            final Rectangle rectangle = new Rectangle(10, 10, color);
+            final Glow niceEffect = new Glow();
+            niceEffect.setInput(new Reflection());
+            rectangle.setEffect(niceEffect);
+            legend.setGraphic(rectangle);
+            i++;
+        }
+    }
+    
+    /**
+        Menú contextual que se despliega haciendo clic derecho sobre el gráfico.
     */
     private ContextMenu setContextMenu() {
         chartManager = new MenuItem("Iniciar gráfico");
@@ -137,13 +184,10 @@ public class ChartTab {
         });
         chartManager.setOnAction(e -> {
             if (sensors.size() > 0) {
-                if (isRunning()) {
+                if (isRunning()) 
                     stop();
-                    //GlyphsDude.setIcon(chartManager, FontAwesomeIcon.PLAY, "1.5em");
-                } else {
+                 else 
                     start(interval);             
-                    //GlyphsDude.setIcon(chartManager, FontAwesomeIcon.STOP, "1.5em");
-                }
             }
         });        
         ContextMenu menu = new ContextMenu(
@@ -153,20 +197,20 @@ public class ChartTab {
         return menu;
     }
     
-    /*
-        Inicia el gráfico
+    /**
+       Inicia el gráfico.
+     * @param interval intervalo de muestreo.
     */
     public void start(long interval) {
         chartManager.setText("Detener gráfico");
-        System.out.println(interval);
         setInterval(interval);
         running = true;
         timer = new Timer();
         plot();
     }
     
-    /*
-        Detiene el gráfico
+    /**
+       Detiene el gráfico.
     */
     public void stop() {
         chartManager.setText("Iniciar gráfico");
@@ -176,43 +220,47 @@ public class ChartTab {
         timer = null;
 
     }
-    /*
-        Retorna verdadero cuando el gráfico está corriendo
+    /**
+      Retorna verdadero cuando el gráfico está corriendo.
     */
     public boolean isRunning() {
         return running;
     }
 
-    /*
-        Limpia los datos que contienen las series del gráfico
+    /**
+      Limpia los datos que contienen las series del gráfico.
     */
     public void clear(){
         sensors.stream().forEach((s) -> {
             s.getCustomSerie().getSerie().getData().clear();
         });
     }
-    /*
-        Obtiene el intervalo en milisegundos
+    /**
+       Obtiene el intervalo en milisegundos.
+     * @return intervalo de tiempo en ms.
     */
     public long getInterval() {
         return interval;
     }
-    /*
-        Asigna un intervalo en milisegundos
+    /**
+       Asigna un intervalo en milisegundos.
+     * @param interval intervalo de tiempo
     */
     public void setInterval(long interval) {
         this.interval = interval;
     }
     
-    /*
-        Obtiene el máximo número de puntos que se pueden mostrar en el gráfico
+    /**
+       Obtiene el máximo número de puntos que se pueden mostrar en el gráfico.
+     * @return entero con los puntos maximos que muestra el gráfico.
     */
     public int getMaxPoint() {
         return maxPoint;
     }
 
-    /*
-        Asigna el máximo número de puntos que se pueden mostrar en el gráfico
+    /**
+       Asigna el máximo número de puntos que se pueden mostrar en el gráfico.
+     * @param maxPoint
     */
     public void setMaxPoint(int maxPoint) {
         this.maxPoint = maxPoint;

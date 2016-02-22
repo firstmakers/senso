@@ -58,7 +58,7 @@ public class Tabcontroller {
         numLigthSensor.addListener(new ChangeListener(){
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                System.out.println("Sensores de luz : "+ (int) newValue );
+                //System.out.println("Sensores de luz : "+ (int) newValue );
                 if((int)newValue==0){
                     deleteTab(lightTab);
                 }
@@ -70,7 +70,7 @@ public class Tabcontroller {
         numTempSensor.addListener(new ChangeListener(){
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                System.out.println("Sensores de Temperatura : "+ (int) newValue );
+                //System.out.println("Sensores de Temperatura : "+ (int) newValue );
                 if((int)newValue==0){
                     deleteTab(tempTab);
                 }
@@ -85,13 +85,12 @@ public class Tabcontroller {
                     numligth++;
                     numLigthSensor.set(numligth);
                     ligthChart.addSensorview(s);
-                    
-
+                    ligthChart.setLegendColor();
                 } else if (s.getSensor().getProfile().equals(TypeSensor.TEMPERATURE)) {
                    numtemp++;
                    numTempSensor.set(numtemp);
                    TemperatureChart.addSensorview(s);
-                   
+                   TemperatureChart.setLegendColor();
                 } else {
                     //desconocido.
                 }
@@ -159,12 +158,12 @@ public class Tabcontroller {
         if (s.getSensor().getProfile().equals(TypeSensor.LIGTH)) {
             numligth++;
             numLigthSensor.set(numligth);
-            ligthChart.addSensorview(s); 
+            ligthChart.addSensorview(s);
+            
         } else if (s.getSensor().getProfile().equals(TypeSensor.TEMPERATURE)) {
             numtemp++;
             numTempSensor.set(numtemp);
             TemperatureChart.addSensorview(s);
-            //System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
         }
     }
 
@@ -173,10 +172,12 @@ public class Tabcontroller {
             ligthChart.removeSensorview(s);
             numligth--;
             numLigthSensor.set(numligth);
+            
         } else if (s.getSensor().getProfile().equals(TypeSensor.TEMPERATURE)) {
             numtemp--;
             TemperatureChart.removeSensorview(s);
             numTempSensor.set(numtemp);
+            TemperatureChart.setLegendColor();
             //System.out.println("TABCONTROLLER temp = "+ numTempSensor.get());
         }
 
@@ -192,5 +193,4 @@ public class Tabcontroller {
         Tab tabSensor = new Tab(title, pane);
         return tabSensor;
     }
-
 }

@@ -23,6 +23,9 @@ public class IntegerFieldSample extends  IntegerField
         this.valueProperty().setValue(v);
         DecimalFormat df = new DecimalFormat("###.###");
         this.setText(df.format(v));
+        if(listener != null){
+            listener.onChange(v);
+        }
     }
     
 }
