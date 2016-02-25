@@ -14,9 +14,6 @@ import java.net.URLConnection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 
 /**
@@ -40,6 +37,8 @@ public class UbidotsClient {
     private Timer timer;
     private Timer netTimer;
     private List<SensorView> sensors;
+    private boolean stop = true;
+    Thread attemptConnection;
     
     public UbidotsClient(String apikey) {
         this.apikey = apikey;
@@ -49,7 +48,8 @@ public class UbidotsClient {
     public void tryToConnect(List<SensorView> sensors) {
         this.sensors = sensors;
         System.err.println("Attempt connectUbibots....");
-        Thread attemptConnection = new Thread(new Task<DataSource>() {
+        attemptConnection = null;
+        attemptConnection = new Thread(new Task<DataSource>() {
         @Override
         protected DataSource call() throws Exception {
             DataSource dataSource = null;
@@ -73,7 +73,8 @@ public class UbidotsClient {
                     if (event != null) {
                         event.isOnline(isOnline);
                     }
-                    startUpdate(sensors);//comienza a enviar datos.
+                    if(!stop)
+                        startUpdate(sensors);//comienza a enviar datos.
                 } else {
                     System.out.println("error al crear el datasource");
                 }
@@ -141,17 +142,18 @@ public class UbidotsClient {
     public void startUpdate(List<SensorView> sensors) {
         long interval = SettingsController.getInterval();
         interval = interval < 10000 ? 10000 : interval;
+        stop = false;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (isOnline) {
+                if (isOnline && !stop) {
                     sensors.forEach((s) -> {
                         Variable var = s.getUbidotsVariable();
-                        System.out.println(var);
+                        System.out.println(var + " "+stop);
                         if (var != null) {
                             var.saveValue(s.getSensor().getValue());
-                            System.out.println("");
+                            //System.out.println("");
                         }
                     });
                 }else{
@@ -163,10 +165,15 @@ public class UbidotsClient {
     }
 
     public void stopUpdate(){
-        if(timer!=null){
+        stop = true;
+        if(timer != null){
             timer.cancel();
             timer.purge();
             timer = null;
+        }
+        if(attemptConnection!=null && attemptConnection.isAlive()){
+            attemptConnection.interrupt();
+            System.err.println("Hilo ubidots interrumpido");
         }
     }
     

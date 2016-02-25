@@ -359,15 +359,14 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
      * Inicia una medición, si está pausada la continúa. Si la medición anterior
      * no ha sido guardada borra todo su contenido.
      */
-    private void clickStart() {
-       
+    private void clickStart() {  
         if (totalSamples > 0 && !pause) {
             clear();
         }
         sampling = true;
         pause = false;
         fm.newWorkbook(getHeader());
-        if(ubidots!=null && !pause)
+        if(ubidots!= null && !pause)
             ubidots.tryToConnect(sensors);
         else 
             System.err.println(ubidots);
@@ -427,8 +426,6 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             info("La medición ha finalizado, haga clic en archivo y luego en guardar.", 5000);
         if(ubidots != null)
             ubidots.stopUpdate();
-        /*if(SettingsController.getAllowUbidots() && !SettingsController.getUbidotsApiKey().isEmpty())
-            fm.createDatasource(getHeader());*/
     }
 
 
@@ -778,11 +775,10 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
                     String minutos = remaining[1] < 10 ? "0" + remaining[1] : remaining[1] + "";
                     String segundos = remaining[2] < 10 ? "0" + remaining[2] : remaining[2] + "";
                     info("La medición comenzará en " + hora + ":" + minutos + ":" + segundos, 0);
-                    if (current >= userProgram) {
+                    if (userProgram <= current) {
                         //
                         clickStart();
                         settings.setFutureSample(false);
-                        programTimer.cancel();
                     }
                 }
             }
@@ -883,11 +879,11 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
 
         futureSampling = event.isAvailableFutureSampling;
         if (futureSampling) {
-            userProgram = event.futureSamplingMs;
+            userProgram = event.futureSamplingMs-1000;
             initTimerFutureSmapling();
         } 
         else{
-            if(programTimer!=null){
+            if(programTimer != null){
                 cancelTimer();
                 info("Se ha cancelado la programación de la medición", 2000);
             }

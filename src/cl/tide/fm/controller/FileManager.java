@@ -84,11 +84,11 @@ public class FileManager {
     * de filas
     */
     public void create(){
+        workbook = null;
+        sheet = null;
         workbook= new SXSSFWorkbook(10);
         sheet = workbook.createSheet("Senso");  
         indexRow = 0; 
-        
-
     }
     /*
     * Exporta un objeto lista a excel, recomendado para archivos con pocas filas
@@ -280,8 +280,7 @@ public class FileManager {
             if( helperVariable!= null && helperVariable.length > 0)
                 isOnline = true;
             else
-                isOnline = false;
-            
+                isOnline = false; 
             System.out.println("Post Execute");
         }
 

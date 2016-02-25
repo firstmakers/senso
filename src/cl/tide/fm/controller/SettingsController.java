@@ -46,6 +46,7 @@ public class SettingsController extends AnchorPane {
 
 
     private FXMLLoader fxmlLoader;
+    private boolean  running = false;
     public static final String PACKAGE = "cl.tide.senso";
     @FXML
     public Tab tabSetting, tabSample, tabInterval, tabProgram;
@@ -179,18 +180,7 @@ public class SettingsController extends AnchorPane {
                 programHour.getValue(),
                 programMinute.getValue(),
                 programSecond.getValue());
-
-        long currentTime = getHourToMillisecond(LocalTime.now().getHour(),
-                LocalTime.now().getMinute(),
-                LocalTime.now().getSecond());
-
-        long ftsample = i == 0 ? 86400000 : i;//  0 == 24 horas
-        System.out.println(ftsample);
-        if (ftsample < currentTime) {
-            ftsample = 86400000 + ftsample;
-            System.out.println(ftsample);
-        }
-        setFutureSampleInMS(ftsample);
+        setFutureSampleInMS(i);
     };
 
     IntegerField.ValueChange intervalChange = (int value) -> {
@@ -206,7 +196,9 @@ public class SettingsController extends AnchorPane {
     private void startTimer() {
         if (timer != null) {
             stopTimer();
+            timer = null;
         }
+        running = true;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -219,9 +211,10 @@ public class SettingsController extends AnchorPane {
                 String minutos = remaining[1] < 10 ? "0" + remaining[1] : remaining[1] + "";
                 String segundos = remaining[2] < 10 ? "0" + remaining[2] : remaining[2] + "";
                 Platform.runLater(() -> {
-                    lbtimer.setText("La medición comenzará en " + hora + ":" + minutos + ":" + segundos);
+                    if(running)
+                        lbtimer.setText("La medición comenzará en " + hora + ":" + minutos + ":" + segundos);
                 });
-                if (current >= getFutureSampleInMS()) {
+                if (getFutureSampleInMS() <= current) {               
                     stopTimer();
                 }
             }
@@ -229,16 +222,22 @@ public class SettingsController extends AnchorPane {
     }
 
     private void stopTimer() {
+         running = false;
         if (timer != null) {
             timer.purge();
             timer.cancel();
         }
-        lbtimer.setText("");
+        if(lbtimer != null)
+            Platform.runLater(()->{
+                lbtimer.setText("");
+            });
+
     }
 
     //////**** PUBLIC METHODS****\\\\\\
     public void show() {
         dialog.show();
+        init();
     }
 
     public void selectWorkspace(ActionEvent event) {
@@ -373,6 +372,7 @@ public class SettingsController extends AnchorPane {
 
         boolean isProgram = getFutureSample();
         cbxfuturesamples.setSelected(isProgram);
+        setFutureSampleInMS(getFutureSampleInMS());
         int[] x = getMsToHMS(getFutureSampleInMS());
         programHour.setValue(x[0]);
         programMinute.setValue(x[1]);
@@ -398,10 +398,16 @@ public class SettingsController extends AnchorPane {
     }
 
     public void setFutureSampleInMS(long ms) {
-        if (ms >= 0) {
-            SettingsController.preferences.putLong(USER_FUTURE_SAMPLES_MS, ms);
-            notifyEvent();
+        long currentTime = getHourToMillisecond(LocalTime.now().getHour(),
+                LocalTime.now().getMinute(),
+                LocalTime.now().getSecond());
+        long ftsample = ms == 0 ? 86400000 : ms;//  0 == 24 horas
+        System.out.println(ftsample);
+        if (ftsample < currentTime) {
+            ftsample = 86400000 + ftsample;
         }
+        SettingsController.preferences.putLong(USER_FUTURE_SAMPLES_MS, ftsample);
+        notifyEvent();  
     }
 
     public void setFutureSample(Boolean value) {
