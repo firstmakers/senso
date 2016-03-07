@@ -8,6 +8,7 @@ package cl.tide.fm.controller;
 import cl.tide.fm.model.SettingsEvent;
 import cl.tide.fm.utilities.IntegerField;
 import cl.tide.fm.utilities.IntegerFieldSample;
+import com.sun.javafx.PlatformUtil;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -37,6 +40,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.ini4j.Reg;
 
 /**
  *
@@ -107,6 +111,8 @@ public class SettingsController extends AnchorPane {
             throw new RuntimeException(exception);
         }
         listener = new ArrayList<>();
+        
+        //createRegistry();
         preferences = Preferences.userRoot().node(PACKAGE);
         this.owner = st;
         this.dialog = new Stage();
@@ -192,6 +198,18 @@ public class SettingsController extends AnchorPane {
         final long interval = i == 0 ? 86400000 : i;//  0 == 24 horas
         setInterval(interval);
     };
+    
+    private void createRegistry(){
+        if(PlatformUtil.isWindows()){
+            try {
+                Reg reg = new Reg();
+                Reg.Key key = reg.add("HKEY_CURRENT_USER\\SOFTWARE\\JavaSoft\\Prefs");
+                reg.write();
+            } catch (IOException ex) {
+                Logger.getLogger(SettingsController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     private void startTimer() {
         if (timer != null) {

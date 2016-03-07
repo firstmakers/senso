@@ -32,11 +32,11 @@ public class FmSenso extends FmDevice {
     
     public  FmSenso()throws HidException{
         super();
+        setProductID(productID);
+        setVendorID(vendorID);
+        setInterval(1000);
         mListener = new ArrayList<>();
         sensorManager = new SensorManager();
-        setProductID(productID);
-        setVendorID(vendorID);   
-        setInterval(1000);
         initialize();
     }
 
@@ -102,6 +102,9 @@ public void start() {
                     l.onStart();   
                 }
             }
+        }else{
+            System.out.println("el dispositivo no está listo... intentando nuevamente");
+            start();
         }
     }
 
@@ -126,6 +129,7 @@ public void start() {
     }
 
     public int writeCommand(byte command) {
+        System.out.println("write command "+ command);
         return super.write(command);
     }
     
@@ -173,6 +177,9 @@ public void start() {
             stopReporter();
             sensorManager.clear();
             writer = null;
+            if(currentDevice!=null && currentDevice.isOpen())
+                currentDevice.close();
+            
         }
     }
 

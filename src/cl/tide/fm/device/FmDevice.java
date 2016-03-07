@@ -3,6 +3,7 @@ package cl.tide.fm.device;
 
 import com.sun.javafx.PlatformUtil;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.hid4java.HidDevice;
@@ -35,16 +36,20 @@ public abstract class FmDevice implements HidServicesListener {
     public FmDevice() throws HidException {
         hidServices = HidManager.getHidServices();
         hidServices.addHidServicesListener(this);
-        devices = new ArrayList<>();
+        devices = new ArrayList<>();     
     }
 
     public void initialize() {
-        getCompatibleDevices(productID, vendorID);
-        if (devices.size() > 0) {
+       // System.out.println("cl.tide.fm.device.FmDevice.initialize() "+ vendorID + " "+ productID );
+        ArrayList<HidDevice> dvcs = getCompatibleDevices(productID, vendorID);
+        if (dvcs.size() > 0) {
             connected = true;
-            currentDevice = devices.get(0);
+            currentDevice = devices.get(0);//toma el primer dispositivo de la lista
             deviceAttached(currentDevice);
-
+        }
+        else{
+            System.err.println("No se encontraron dispositivos compatibles");
+            initialize();
         }
     }
 
@@ -142,11 +147,16 @@ public abstract class FmDevice implements HidServicesListener {
      *@param vid this is the vender ID (device)
      */
     public ArrayList<HidDevice> getCompatibleDevices(short pid, short vid) {
-        hidServices.getAttachedHidDevices().stream().filter((hidDevice) -> 
-                (hidDevice.getProductId() == pid && hidDevice.getVendorId() == vid))
-                .forEach((hidDevice) -> {
-                    devices.add(hidDevice);
-                });
+        List<HidDevice> currentDv = hidServices.getAttachedHidDevices();
+        for(HidDevice d : currentDv){
+            if(d.getProductId() == pid && d.getVendorId() == vid){
+                devices.add(d);
+                 System.out.println("Senso Found "+ d.getProductId() +" "+ d.getVendorId());
+            }
+            else{
+                System.out.println( d.getProductId() +" "+ d.getVendorId() + " looking for "+pid+" "+vid);
+            }
+        }
         return this.devices;
     }
 
@@ -170,19 +180,21 @@ public abstract class FmDevice implements HidServicesListener {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                byte inBuffer[] = new byte[PACKET_LENGHT];
-                int val = currentDevice.read(inBuffer);
-                switch (val) {
-                    case -1:
-                        //System.err.println(currentDevice.getLastErrorMessage()); always throw null
-                        break;
-                    case 0:
-                        break;
-                    default:
-                        if (inBuffer != null) {
-                            reportData(inBuffer);
-                        }
-                        break;
+                if (currentDevice != null && currentDevice.isOpen()) {
+                    byte inBuffer[] = new byte[PACKET_LENGHT];
+                    int val = currentDevice.read(inBuffer);
+                    switch (val) {
+                        case -1:
+                            System.err.println(currentDevice.getLastErrorMessage());
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            if (inBuffer != null) {
+                                reportData(inBuffer);
+                            }
+                            break;
+                    }
                 }
             }
         }, 0, 100);

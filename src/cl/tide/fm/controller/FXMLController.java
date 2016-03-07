@@ -104,6 +104,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             fmSenso = new FmSenso();
             fmSenso.addFmSensoListener(this);
             sensors = new ArrayList<>(6);
+            
         } catch (HidException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -120,10 +121,6 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             }
         });
 
-        if (fmSenso.isConnected()) {
-            configChart();
-            fmSenso.start();
-        }
         settings = new SettingsController(getStage());
         fm = new FileManager(sensors, this);
         settings.addListener(this);
@@ -131,7 +128,14 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         futureSampling = SettingsController.getFutureSample();
 
         configUbibots();
-
+        
+        if (fmSenso.isConnected()) {
+            configChart();
+            fmSenso.start();
+        }
+        else{
+            System.out.println("El Dispositivo no está conectado");
+        }
     }
 
 
