@@ -37,7 +37,7 @@ public class UbidotsClient {
     private Timer timer;
     private Timer netTimer;
     private List<SensorView> sensors;
-    private boolean stop = true;
+    private boolean stop = false;
     Thread attemptConnection;
     
     public UbidotsClient(String apikey) {
@@ -75,6 +75,8 @@ public class UbidotsClient {
                     }
                     if(!stop)
                         startUpdate(sensors);//comienza a enviar datos.
+                    else
+                       System.out.println("stopped " + stop);
                 } else {
                     System.out.println("error al crear el datasource");
                 }
@@ -142,6 +144,7 @@ public class UbidotsClient {
     public void startUpdate(List<SensorView> sensors) {
         long interval = SettingsController.getInterval();
         interval = interval < 10000 ? 10000 : interval;
+        System.err.println("interval update"+interval);
         stop = false;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {

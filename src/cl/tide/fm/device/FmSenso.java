@@ -102,9 +102,6 @@ public void start() {
                     l.onStart();   
                 }
             }
-        }else{
-            System.out.println("el dispositivo no está listo... intentando nuevamente");
-            start();
         }
     }
 
@@ -129,7 +126,7 @@ public void start() {
     }
 
     public int writeCommand(byte command) {
-        System.out.println("write command "+ command);
+       // System.out.println("write command "+ command);
         return super.write(command);
     }
     
@@ -177,8 +174,8 @@ public void start() {
             stopReporter();
             sensorManager.clear();
             writer = null;
-            if(currentDevice!=null && currentDevice.isOpen())
-                currentDevice.close();
+            //if(currentDevice!=null && currentDevice.isOpen())
+                //currentDevice.close();
             
         }
     }

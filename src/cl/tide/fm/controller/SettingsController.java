@@ -40,7 +40,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.ini4j.Reg;
+
 
 /**
  *
@@ -199,7 +199,7 @@ public class SettingsController extends AnchorPane {
         setInterval(interval);
     };
     
-    private void createRegistry(){
+    /*private void createRegistry(){
         if(PlatformUtil.isWindows()){
             try {
                 Reg reg = new Reg();
@@ -209,7 +209,7 @@ public class SettingsController extends AnchorPane {
                 Logger.getLogger(SettingsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
+    }*/
 
     private void startTimer() {
         if (timer != null) {

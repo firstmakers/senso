@@ -30,26 +30,46 @@ public abstract class FmDevice implements HidServicesListener {
     //Thread thread;
     private boolean connected = false;
     Timer timer;
+    Timer listenPorts;
 
     protected String version = "";
 
     public FmDevice() throws HidException {
         hidServices = HidManager.getHidServices();
-        hidServices.addHidServicesListener(this);
         devices = new ArrayList<>();     
     }
 
     public void initialize() {
        // System.out.println("cl.tide.fm.device.FmDevice.initialize() "+ vendorID + " "+ productID );
-        ArrayList<HidDevice> dvcs = getCompatibleDevices(productID, vendorID);
-        if (dvcs.size() > 0) {
-            connected = true;
-            currentDevice = devices.get(0);//toma el primer dispositivo de la lista
-            deviceAttached(currentDevice);
-        }
-        else{
-            System.err.println("No se encontraron dispositivos compatibles");
-            initialize();
+
+        findDevices();
+        
+    }
+    
+    private void findDevices() {
+        listenPorts = new Timer();
+        listenPorts.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.err.println("No se encontraron dispositivos compatibles " + System.currentTimeMillis());
+                ArrayList<HidDevice> dvcs = getCompatibleDevices(productID, vendorID);
+                if (dvcs.size() > 0) {
+                    connected = true;
+                    currentDevice = devices.get(0);//toma el primer dispositivo de la lista
+                    hidServices.addHidServicesListener(FmDevice.this);
+                    exitListenPorts();
+                    deviceAttached(currentDevice);
+                    exitListenPorts();
+                }
+            }
+        }, 1000, 1000);
+    }
+    
+    private void exitListenPorts(){
+        if(listenPorts != null){
+            listenPorts.cancel();
+            listenPorts.purge();
+            listenPorts = null;
         }
     }
 
@@ -63,7 +83,6 @@ public abstract class FmDevice implements HidServicesListener {
                 connected = true;
                 currentDevice = hidDevice;
                 deviceAttached(currentDevice);
-
             }
         }
     }
@@ -136,6 +155,7 @@ public abstract class FmDevice implements HidServicesListener {
     }
 
     public void stopReporter() {
+        exitListenPorts();
         if(timer != null)
             timer.cancel();
         timer = null;
@@ -185,7 +205,7 @@ public abstract class FmDevice implements HidServicesListener {
                     int val = currentDevice.read(inBuffer);
                     switch (val) {
                         case -1:
-                            System.err.println(currentDevice.getLastErrorMessage());
+                            //System.err.println(currentDevice.getLastErrorMessage());
                             break;
                         case 0:
                             break;
