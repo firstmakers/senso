@@ -171,7 +171,6 @@ public class UbidotsClient {
         stop = true;
         if(timer != null){
             timer.cancel();
-            timer.purge();
             timer = null;
         }
         if(attemptConnection!=null && attemptConnection.isAlive()){
@@ -217,7 +216,6 @@ public class UbidotsClient {
     private void stopCheckingNetwork() {
         if(netTimer != null){
             netTimer.cancel();
-            netTimer.purge();
             netTimer=null;
         }
     }

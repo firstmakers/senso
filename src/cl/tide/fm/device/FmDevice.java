@@ -57,7 +57,6 @@ public abstract class FmDevice implements HidServicesListener {
                     connected = true;
                     currentDevice = devices.get(0);//toma el primer dispositivo de la lista
                     hidServices.addHidServicesListener(FmDevice.this);
-                    exitListenPorts();
                     deviceAttached(currentDevice);
                     exitListenPorts();
                 }
@@ -65,10 +64,10 @@ public abstract class FmDevice implements HidServicesListener {
         }, 1000, 1000);
     }
     
-    private void exitListenPorts(){
+    public void exitListenPorts(){
         if(listenPorts != null){
             listenPorts.cancel();
-            listenPorts.purge();
+   
             listenPorts = null;
         }
     }

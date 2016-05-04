@@ -26,7 +26,7 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         st = stage;
         name = "Senso";
-        version = "1.0.4";
+        version = "1.1";
         URL location = getClass().getResource("/fxml/Scene.fxml");
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(location);

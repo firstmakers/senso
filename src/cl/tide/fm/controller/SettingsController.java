@@ -6,9 +6,10 @@
 package cl.tide.fm.controller;
 
 import cl.tide.fm.model.SettingsEvent;
+import cl.tide.fm.sensonet.SensonetClient;
+import cl.tide.fm.sensonet.User;
 import cl.tide.fm.utilities.IntegerField;
 import cl.tide.fm.utilities.IntegerFieldSample;
-import com.sun.javafx.PlatformUtil;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -19,10 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,10 +32,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -52,20 +56,24 @@ public class SettingsController extends AnchorPane {
     private FXMLLoader fxmlLoader;
     private boolean  running = false;
     public static final String PACKAGE = "cl.tide.senso";
+    @FXML PasswordField sensonetPassword;
+    @FXML Text passwordError, emailError, infoConnect;
     @FXML
     public Tab tabSetting, tabSample, tabInterval, tabProgram;
     @FXML
     public TabPane tabPaneSetting;
     @FXML
-    public TextField workspace, apikey;
+    public TextArea sensonetToken;
     @FXML
-    Hyperlink linkaccount;
+    public TextField workspace, apikey, sensonetEmail;
     @FXML
-    Button btnworkspace, btnOk;
+    Hyperlink linkaccount, linkSensonet;
+    @FXML
+    Button btnworkspace, btnOk, testConnect;
     @FXML
     Label lbtimer;
     @FXML
-    CheckBox cbxsaveall, cbxanimation, cbxfuturesamples, cbxubidots;
+    CheckBox cbxsaveall, cbxanimation, cbxfuturesamples, cbxubidots, autoconnect;
     public static int GENERAL_SETTINGS = 0;
     public static int SAMPLE_SETTINGS = 1;
     public static int INTERVAL_SETTINGS = 2;
@@ -89,6 +97,16 @@ public class SettingsController extends AnchorPane {
     private static final String USER_APIKEY_DEFAULT = "";
     private static final String USER_ALLOW_UBIDOTS = "allow_ubidots";
     private static final Boolean USER_ALLOW_UBIDOTS_DEFAULT = false;
+
+    private static final String SENSONET_KEY_PROJECT = "sensonet_key_project";
+    private static final String SENSONET_KEY_PROJECT_DEFAULT = "";
+    private static final String USER_SENSONET = "user_sensonet";
+    private static final String USER_SENSONET_DEFAULT = "";
+    private static final String PASS_SENSONET = "sensonet_password";
+    private static final String PASS_SENSONET_DEFAULT = "";
+    private static final String SENSONET_AUTOCONNECT = "sensonet_autoconnect";
+    private static final Boolean SENSONET_AUTOCONNECT_DEFAULT = true; 
+    
     private final Stage owner;
     private final Stage dialog;
     private List<SettingsChange> listener;
@@ -131,7 +149,24 @@ public class SettingsController extends AnchorPane {
             stopTimer();
             System.err.println("cerrando configuración");
         });
-
+        testConnect.focusedProperty().addListener((change)->{
+            infoConnect.setText("");
+        });
+        sensonetPassword.focusedProperty().addListener(new ChangeListener<Boolean>(){
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                   passwordError.setText("");
+                }
+            });
+        sensonetEmail.focusedProperty().addListener(new ChangeListener<Boolean>(){
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                   emailError.setText("");
+                }
+            });
+        autoconnect.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            setSensonetAutoConnect(newValue);
+        });
         
         cbxubidots.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             setAllowAUbidots(newValue);
@@ -167,7 +202,18 @@ public class SettingsController extends AnchorPane {
         btnOk.setOnAction((e) -> {
             dialog.close();
         });
+        sensonetToken.textProperty().addListener((obs,oldv,newv)->{
+            setSensonetProject(newv);
+        });
         
+        sensonetEmail.textProperty().addListener((obs,oldv, newv)->{
+            //System.out.println(newv);
+            setSensonetUser(newv);
+        });
+        
+        sensonetPassword.textProperty().addListener((obs,oldv,newv)->{
+            setSensonetPassword(newv);
+        });
         apikey.textProperty().addListener((obs,oldv,newv)->{
             setUbidotsApiKey(newv);
         });
@@ -331,6 +377,33 @@ public class SettingsController extends AnchorPane {
                 + min * 60000
                 + sec * 1000;
     }
+    
+    public static String getSensonetUser(){
+        return SettingsController.preferences.get(USER_SENSONET, USER_SENSONET_DEFAULT);
+    }
+    public static void setSensonetUser(String user){
+        SettingsController.preferences.put(USER_SENSONET, user);
+    }
+    public static String getSensonetPassword(){
+        return SettingsController.preferences.get(PASS_SENSONET, PASS_SENSONET_DEFAULT);
+    }
+    public static void setSensonetPassword(String pass){
+        SettingsController.preferences.put(PASS_SENSONET, pass);
+    }
+    
+    public static String getSensonetProject(){
+    return SettingsController.preferences.get(SENSONET_KEY_PROJECT, SENSONET_KEY_PROJECT_DEFAULT);
+    }
+    public  void setSensonetProject(String key){
+        SettingsController.preferences.put(SENSONET_KEY_PROJECT, key);
+        notifyEvent();
+    }
+    public static Boolean getSensonetAutoConnect(){
+        return SettingsController.preferences.getBoolean(SENSONET_AUTOCONNECT, SENSONET_AUTOCONNECT_DEFAULT);
+    }
+    public static void setSensonetAutoConnect(Boolean key){
+        SettingsController.preferences.putBoolean(SENSONET_AUTOCONNECT, key);
+    }
 
     public static int[] getMsToHMS(long ms) {
         int[] hms = new int[3];
@@ -349,10 +422,57 @@ public class SettingsController extends AnchorPane {
         } catch (IOException | URISyntaxException e1) {
         }
     }
+    
+    /**
+     * Abre el navegador para crear una cuenta sensonet
+     */
+    public void openSensonetAccount(ActionEvent e){
+        linkSensonet.setVisited(false);
+        try {
+            Desktop.getDesktop()
+                    .browse(new URI(SensonetClient.baseUrl.concat("signup")));
+        } catch (IOException | URISyntaxException e1) {
+        }
+    }
+    
+    public void testLogin(ActionEvent e){
+        infoConnect.setText("");
+        String email = sensonetEmail.getText();
+        String password = sensonetPassword.getText();
+     
+        if(password.isEmpty()){
+            passwordError.setText("Debes ingresar la contraseña");
+            return;
+        }else if(email.isEmpty()){
+            emailError.setText("Debes ingresar u correo electrónico");
+            return;
+        }
+        else{
+            if(SensonetClient.netIsAvailable()){
+            infoConnect.setText("Accediendo...");
+            testConnect.setDisable(true);
+            SensonetClient sensonet = new SensonetClient();
+           
+             User user = sensonet.login(email, password);
+             if(user != null){
+                 infoConnect.setText("Bienvenido "+ user.name);
+             }else{
+                 infoConnect.setText("Ocurrio un error, revisa tu usuario y contraseña ");
+             }
+             sensonet.close();
+             testConnect.setDisable(false);
+            }else{
+                infoConnect.setText("Comprueba tu conexión de internet");
+            }
+        }
+    }
 
 
     ///////**** PRIVATE METHODS *****\\\\\\\
     private void init() {
+        sensonetEmail.setText(getSensonetUser());
+        sensonetPassword.setText(getSensonetPassword());
+        sensonetToken.setText(getSensonetProject());
         apikey.setText(getUbidotsApiKey());
         setAllowAUbidots(getAllowUbidots());
         setSaveAllFiles(getSaveAllFiles());
@@ -467,7 +587,8 @@ public class SettingsController extends AnchorPane {
                 getInterval(),
                 getSamples(),
                 getFutureSample(),
-                getFutureSampleInMS()
+                getFutureSampleInMS(),
+                getSensonetProject()
         );
     }
 

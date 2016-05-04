@@ -21,7 +21,10 @@
                         <TextField fx:id="workspace" layoutX="52.0" layoutY="106.0" prefHeight="27.0" prefWidth="398.0" />
                         <Button fx:id="btnworkspace" layoutX="458.0" layoutY="105.0" mnemonicParsing="false" onAction="#selectWorkspace" prefHeight="27.0" prefWidth="102.0" text="Ruta" AnchorPane.rightAnchor="40.0" />
                         <Separator layoutX="52.0" layoutY="33.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
-                        <Label layoutX="40.0" layoutY="23.0" text="Configuración general" />
+                        <Label layoutX="40.0" layoutY="23.0" text="Configuración general">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Label>
                         <Label layoutX="40.0" layoutY="143.0" text="Datos en línea (se requiere conexión a internet)" />
                         <Separator layoutX="51.0" layoutY="159.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="159.0" />
                         <TextField fx:id="apikey" layoutX="52.0" layoutY="199.0" prefHeight="27.0" prefWidth="398.0" />
@@ -35,7 +38,10 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="40.0" layoutY="23.0" text="Número de muestras:" />
+                        <Label layoutX="40.0" layoutY="23.0" text="Número de muestras:">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Label>
                         <Separator layoutX="52.0" layoutY="40.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
                         <IntegerFieldSample fx:id="sample" alignment="CENTER_RIGHT" layoutX="40" layoutY="60" prefHeight="27" prefWidth="145" />
                      </children></AnchorPane>
@@ -46,7 +52,10 @@
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                       <children>
                           <Separator prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
-                          <Label layoutX="40.0" layoutY="23.0" text="Intervalo entre muestras:" />
+                          <Label layoutX="40.0" layoutY="23.0" text="Intervalo entre muestras:">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Label>
                           <IntegerField fx:id="hour" alignment="CENTER" layoutX="40" layoutY="60" prefHeight="27" prefWidth="45" />
                           <IntegerField fx:id="minute" alignment="CENTER" layoutX="87" layoutY="60" prefHeight="27" prefWidth="45" />
                           <IntegerField fx:id="second" alignment="CENTER" layoutX="133.0" layoutY="60" prefHeight="27" prefWidth="45" />
@@ -66,7 +75,10 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <Separator prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
-                        <Label layoutX="40.0" layoutY="23.0" text="Programar el inicio de una medición:" />
+                        <Label layoutX="40.0" layoutY="23.0" text="Programar el inicio de una medición:">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Label>
                           <IntegerField fx:id="programHour" alignment="CENTER" layoutX="40" layoutY="60" prefHeight="27" prefWidth="45" />
                           <IntegerField fx:id="programMinute" alignment="CENTER" layoutX="87" layoutY="60" prefHeight="27" prefWidth="45" />
                           <IntegerField fx:id="programSecond" alignment="CENTER" layoutX="133.0" layoutY="60" prefHeight="27" prefWidth="45" />
@@ -80,6 +92,32 @@
                               <Font size="14.0" />
                            </font></Label>
                      </children></AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="SensoNET">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="40.0" layoutY="23.0" text="Autenticación">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Separator layoutX="52.0" layoutY="33.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" />
+                        <TextField fx:id="sensonetEmail" layoutX="40.0" layoutY="68.0" prefHeight="27.0" prefWidth="220.0" promptText="email" />
+                        <Text layoutX="42.0" layoutY="166.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Token Projecto" />
+                        <PasswordField fx:id="sensonetPassword" layoutX="339.0" layoutY="68.0" prefHeight="27.0" prefWidth="220.0" promptText="contraseña" />
+                        <TextArea fx:id="sensonetToken" layoutX="42.0" layoutY="170.0" prefHeight="53.0" prefWidth="517.0" promptText="Ingresar el token proporcionado en SensoNET" wrapText="true" />
+                        <Text layoutX="40.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Correo electrónico" />
+                        <Text layoutX="339.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña" />
+                        <Hyperlink fx:id="linkSensonet" layoutX="443.0" layoutY="19.0" onAction="#openSensonetAccount" text="Crear una cuenta" />
+                        <CheckBox fx:id="autoconnect" layoutX="40.0" layoutY="123.0" mnemonicParsing="false" selected="true" text="Conectar y enviar datos automáticamente" />
+                        <Button fx:id="testConnect" layoutX="442.0" layoutY="119.0" mnemonicParsing="false" onAction="#testLogin" text="Probar conexión" />
+                        <Text fx:id="emailError" fill="RED" layoutX="41.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="218.21875" />
+                        <Text fx:id="passwordError" fill="RED" layoutX="339.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="219.21875" />
+                        <Text fx:id="infoConnect" layoutX="200.0" layoutY="158.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="RIGHT" wrappingWidth="359.21875" />
+                     </children>
+                  </AnchorPane>
               </content>
             </Tab>
         </tabs>

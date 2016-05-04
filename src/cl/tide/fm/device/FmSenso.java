@@ -65,8 +65,17 @@ public class FmSenso extends FmDevice {
     }
     
     public synchronized void addFmSensoListener(FmSensoListener listener){
-        if(!mListener.contains(listener))
+        if(!mListener.contains(listener)){
             mListener.add(listener);
+             System.out.println("Listener Added " + listener.getClass());
+        }
+
+    }
+    public synchronized void removeFmSensoListener(FmSensoListener listener){
+        if(mListener.contains(listener)){
+            mListener.remove(listener);
+            System.out.println("Listener Removed " + listener.getClass());
+        }
     }
       
     @Override
@@ -161,6 +170,7 @@ public void start() {
     }
    
     public void stop() {
+        exitListenPorts();
         if (running) {
             running = false;
             writer.cancel();

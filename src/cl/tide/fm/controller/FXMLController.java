@@ -5,6 +5,10 @@ import static cl.tide.fm.controller.ProgramController.getHourToMillisecond;
 import static cl.tide.fm.controller.ProgramController.getMsToHMS;
 import cl.tide.fm.device.*;
 import cl.tide.fm.model.*;
+import cl.tide.fm.sensonet.Project;
+import cl.tide.fm.sensonet.SensonetClient;
+import cl.tide.fm.sensonet.SensonetEvents;
+import cl.tide.fm.sensonet.User;
 import cl.tide.fm.tour.Tour;
 import com.ubidots.*;
 import java.io.File;
@@ -84,6 +88,10 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
     private Boolean futureSampling;
     private Boolean closing = false;
     private UbidotsClient ubidots;
+    private SensonetClient sensonet;
+    private Boolean sensonetStatus = false; 
+    private String tokenProject = "";
+    
 
     FileManager fm;
 
@@ -110,9 +118,9 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         }
         sensorContainer.getChildren().add(control);
 
-        if (sensors.isEmpty() && fmSenso.isConnected()) {
+        /*if (sensors.isEmpty() && fmSenso.isConnected()) {
             addInternalSensor();
-        }
+        }*/
         setStatusDevice(fmSenso.getCurrentDevice());
 
         clearChart.setOnAction((ActionEvent event) -> {
@@ -129,13 +137,15 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
 
         configUbibots();
         
-        if (fmSenso.isConnected()) {
+        /*if (fmSenso.isConnected()) {
             configChart();
             fmSenso.start();
         }
         else{
             System.out.println("El Dispositivo no está conectado");
-        }
+        }*/
+        
+        //configSensonet();
     }
 
 
@@ -154,6 +164,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         view.setID(s.getId());
         view.setCustomSerie(new CustomSeries(view.getName()));
         sensors.add(view);
+        //if(sensonetStatus && sensonet!=null) sensonet.addSensor(view);
         addView(view);
     }
 
@@ -162,10 +173,17 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
     public void close() {
         closing = true;
         fmSenso.stop();
+        fmSenso.removeFmSensoListener(this);
+        if(ubidots!=null)
+            ubidots.close();
         if (mTab != null) {
             mTab.stop();
         }
         cancelTimer();
+        if(sensonet!=null)
+            sensonet.close();
+        
+        System.out.println("Close");
     }
 
     @Override
@@ -180,13 +198,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
 
     @Override
     public void onStart() {
-        System.out.println("Start");
-        Platform.runLater(() -> {
-            if (fmSenso.isRunning()) {
-                fmSenso.addFmSensoListener(this);
-            }
-        });
- 
+        System.out.println("FmSenso has started");
     }
 
     /**
@@ -196,14 +208,17 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
      */
     @Override
     public void onAttachedDevice(HidDevice device) {
+        System.out.println("SE CONECTO UN SENSO");
         setStatusDevice(device);
         addInternalSensor();
-        System.out.println("New device attached");
+  
         info("Se conectó un dispositivo", 2000);
         if (!fmSenso.isRunning()) {
             configChart();
             fmSenso.start();
         }
+        if(sensonet == null)
+            configSensonet();
     }
 
     /**
@@ -218,6 +233,12 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             mTab.closeAllTab();
             sensorContainer.getChildren().removeAll(sensors);
             sensors.clear();
+            if (sensonet != null) {
+                sensonet.close();
+                sensonet = null;
+                sensonetStatus = false;
+            }
+            //fmSenso.removeFmSensoListener(this);
             System.out.println("Current device Detached ");
             clear();
         });
@@ -259,6 +280,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
                 if (sensors.get(i).getID().equals(id)) {
                     removeView(sensors.get(i));
                     mTab.removeSensorview(sensors.get(i));
+                    if(sensonet!=null) sensonet.removeSensor(sensors.get(i));
                     sensors.remove(i);
                 }
             }
@@ -295,6 +317,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             sensors.add(sensor);
             addView(sensor);
             mTab.addSensorview(sensor);
+            if(sensonet!=null) sensonet.addSensor(sensor);
         }
        });
         
@@ -320,6 +343,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
     private void addView(final Node node) {
         Platform.runLater(() -> {
             final SensorView view = (SensorView) node;
+         
             view.addListener((boolean visible, CustomSeries customSerie, Boolean status) -> {
                 setChanges(view, status);
             });
@@ -372,6 +396,8 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         fm.newWorkbook(getHeader());
         if(ubidots!= null && !pause)
             ubidots.tryToConnect(sensors);
+        if(sensonetStatus && !pause)
+            sensonet.start(sensors);
         else 
             System.err.println(ubidots);
         if (fmSenso.isRunning() && userInterval > 999 && userSamples > 0) {
@@ -430,6 +456,8 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             info("La medición ha finalizado, haga clic en archivo y luego en guardar.", 5000);
         if(ubidots != null)
             ubidots.stopUpdate();
+        if(sensonet != null && sensonetStatus)
+            sensonet.stop();
     }
 
 
@@ -858,7 +886,9 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
      */
     @Override
     public void onSettingsChanged(SettingsEvent event) {
-
+        if(!event.tokenProject.equals(this.tokenProject))
+            configSensonet();
+       
         if (event.interval != userInterval) {
             setInterval(event.interval);
         }//
@@ -931,4 +961,37 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             });
         }
     }
+
+    private void configSensonet() {
+        sensonetStatus = false;
+        if(sensonet!=null)
+            sensonet.close();
+        sensonet = new SensonetClient();
+        boolean auto = SettingsController.getSensonetAutoConnect();
+        if (auto) {
+            String email = SettingsController.getSensonetUser();
+            String pass = SettingsController.getSensonetPassword();
+            tokenProject = SettingsController.getSensonetProject();
+
+            if (!SensonetClient.netIsAvailable()) {
+                sensonetStatus = false;
+            } else if (email.isEmpty() || tokenProject.isEmpty() || pass.isEmpty()) {
+                sensonetStatus = false;
+            }else{
+                 User user = sensonet.login(email, pass);
+                 
+                 Project project = sensonet.setToken(tokenProject);
+                 if(user == null || project == null){
+                     sensonetStatus = false;
+                 }else{
+                     sensonetStatus = true;
+                 }
+            }
+        }
+        //sensonet.close();
+        System.out.println();
+        System.out.println("Sensonet Available " + sensonetStatus);
+        System.out.println();
+    }
+    
 }
