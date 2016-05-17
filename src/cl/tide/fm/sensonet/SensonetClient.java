@@ -136,7 +136,6 @@ public class SensonetClient {
     
     
     public User login(String email, String password)  {
-
         HttpPut login = new HttpPut(baseUrl.concat("login"));
         try {
             List<NameValuePair> nvps = new ArrayList<>();

@@ -207,7 +207,6 @@ public class SettingsController extends AnchorPane {
         });
         
         sensonetEmail.textProperty().addListener((obs,oldv, newv)->{
-            //System.out.println(newv);
             setSensonetUser(newv);
         });
         
@@ -322,7 +321,7 @@ public class SettingsController extends AnchorPane {
     }
     
     public static void setUbidotsVariable(String idSensor, String idVariableUbidots){
-        SettingsController.preferences.put(idSensor, idVariableUbidots);
+        SettingsController.preferences.put(idSensor, sanitize(idVariableUbidots));
     }
     
     public static String getUbidotsDataSource() {
@@ -330,7 +329,7 @@ public class SettingsController extends AnchorPane {
     }
 
     public static void setUbidotsDataSource(String id) {
-        SettingsController.preferences.put(UBIDOTS_ID_DATASOURCE, id);
+        SettingsController.preferences.put(UBIDOTS_ID_DATASOURCE, sanitize(id));
     }
 
     private void setAnimation(Boolean value) {
@@ -382,20 +381,20 @@ public class SettingsController extends AnchorPane {
         return SettingsController.preferences.get(USER_SENSONET, USER_SENSONET_DEFAULT);
     }
     public static void setSensonetUser(String user){
-        SettingsController.preferences.put(USER_SENSONET, user);
+        SettingsController.preferences.put(USER_SENSONET, sanitize(user));
     }
     public static String getSensonetPassword(){
         return SettingsController.preferences.get(PASS_SENSONET, PASS_SENSONET_DEFAULT);
     }
     public static void setSensonetPassword(String pass){
-        SettingsController.preferences.put(PASS_SENSONET, pass);
+        SettingsController.preferences.put(PASS_SENSONET, sanitize(pass));
     }
     
     public static String getSensonetProject(){
     return SettingsController.preferences.get(SENSONET_KEY_PROJECT, SENSONET_KEY_PROJECT_DEFAULT);
     }
     public  void setSensonetProject(String key){
-        SettingsController.preferences.put(SENSONET_KEY_PROJECT, key);
+        SettingsController.preferences.put(SENSONET_KEY_PROJECT, sanitize(key));
         notifyEvent();
     }
     public static Boolean getSensonetAutoConnect(){
@@ -555,7 +554,8 @@ public class SettingsController extends AnchorPane {
     
     
     private void setUbidotsApiKey(String key){
-        SettingsController.preferences.put(USER_APIKEY, key);
+        
+        SettingsController.preferences.put(USER_APIKEY, sanitize(key));
         notifyEvent();
     }
 
@@ -645,6 +645,12 @@ public class SettingsController extends AnchorPane {
         }
         SettingsController.preferences.putBoolean(USER_ALLOW_UBIDOTS, newValue);
         notifyEvent();
+    }
+    /**
+     * Elimina espacios vacios y saltos de linea.
+     */
+    private static String sanitize(String string){
+        return  string.replaceAll("\n", "").replaceAll(" ", "").trim();
     }
 
     public interface SettingsChange {
