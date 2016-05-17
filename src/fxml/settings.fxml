@@ -25,11 +25,11 @@
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font></Label>
-                        <Label layoutX="40.0" layoutY="143.0" text="Datos en línea (se requiere conexión a internet)" />
+                        <!--Label layoutX="40.0" layoutY="143.0" text="Datos en línea (se requiere conexión a internet)" />
                         <Separator layoutX="51.0" layoutY="159.0" prefWidth="200.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="159.0" />
                         <TextField fx:id="apikey" layoutX="52.0" layoutY="199.0" prefHeight="27.0" prefWidth="398.0" />
                         <Hyperlink fx:id="linkaccount" layoutX="435.0" layoutY="139.0" onAction="#openLink" text="(Crear una cuenta)" />
-                        <CheckBox fx:id="cbxubidots" layoutX="52.0" layoutY="171.0" mnemonicParsing="false" text="Enviar datos a Ubidots, ingrese su APIKEY a continuación:" />
+                        <CheckBox fx:id="cbxubidots" layoutX="52.0" layoutY="171.0" mnemonicParsing="false" text="Enviar datos a Ubidots, ingrese su APIKEY a continuación:" /-->
                      </children>
                   </AnchorPane>
             </content>

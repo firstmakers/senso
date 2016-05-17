@@ -249,7 +249,7 @@ public class FileManager {
     }  
     
     
-    class PrepareUbidots extends AsyncTask{
+    /*class PrepareUbidots extends AsyncTask{
         FXMLController ctrl;
         public PrepareUbidots(FXMLController ctrl){
             this.ctrl = ctrl;
@@ -288,5 +288,5 @@ public class FileManager {
         public void progressCallback(Object... params) {
             
         }
-    }
+    }*/
 }

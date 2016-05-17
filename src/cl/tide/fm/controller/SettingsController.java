@@ -67,19 +67,19 @@ public class SettingsController extends AnchorPane {
     @FXML
     public TextField workspace, apikey, sensonetEmail;
     @FXML
-    Hyperlink linkaccount, linkSensonet;
+    Hyperlink /*linkaccount,*/ linkSensonet;
     @FXML
     Button btnworkspace, btnOk, testConnect;
     @FXML
     Label lbtimer;
     @FXML
-    CheckBox cbxsaveall, cbxanimation, cbxfuturesamples, cbxubidots, autoconnect;
+    CheckBox cbxsaveall, cbxanimation, cbxfuturesamples, /*cbxubidots,*/ autoconnect;
     public static int GENERAL_SETTINGS = 0;
     public static int SAMPLE_SETTINGS = 1;
     public static int INTERVAL_SETTINGS = 2;
     public static int PROGRAM_SETTINGS = 3;
     private static final Boolean USE_ANIMATION_DEFAULT = false;
-    private static final String UBIDOTS_ID_DATASOURCE = "ubidots_id_data_source";
+    //private static final String UBIDOTS_ID_DATASOURCE = "ubidots_id_data_source";
     private static final String USE_ANIMATION = "use_animation";
     private static final String SAVE_ALL_FILES = "save_all_files";
     private static final Boolean SAVE_ALL_FILES_DEFAULT = false;
@@ -93,10 +93,10 @@ public class SettingsController extends AnchorPane {
     private static final long USER_FUTURE_SAMPLES_MS_DEFAULT = 0;
     private static final long USER_INTERVAL_DEFAULT = 1000;
     private static final int USER_SAMPLES_DEFAULT = 1000;
-    private static final String USER_APIKEY = "ubidots_apikey";
+    //private static final String USER_APIKEY = "ubidots_apikey";
     private static final String USER_APIKEY_DEFAULT = "";
-    private static final String USER_ALLOW_UBIDOTS = "allow_ubidots";
-    private static final Boolean USER_ALLOW_UBIDOTS_DEFAULT = false;
+    //private static final String USER_ALLOW_UBIDOTS = "allow_ubidots";
+    //private static final Boolean USER_ALLOW_UBIDOTS_DEFAULT = false;
 
     private static final String SENSONET_KEY_PROJECT = "sensonet_key_project";
     private static final String SENSONET_KEY_PROJECT_DEFAULT = "";
@@ -168,9 +168,9 @@ public class SettingsController extends AnchorPane {
             setSensonetAutoConnect(newValue);
         });
         
-        cbxubidots.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+        /*cbxubidots.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             setAllowAUbidots(newValue);
-        });
+        });*/
         cbxanimation.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             setAnimation(newValue);
         });
@@ -213,9 +213,9 @@ public class SettingsController extends AnchorPane {
         sensonetPassword.textProperty().addListener((obs,oldv,newv)->{
             setSensonetPassword(newv);
         });
-        apikey.textProperty().addListener((obs,oldv,newv)->{
+        /*apikey.textProperty().addListener((obs,oldv,newv)->{
             setUbidotsApiKey(newv);
-        });
+        });*/
         init();
     }
 
@@ -315,7 +315,7 @@ public class SettingsController extends AnchorPane {
     public void setSelected(int index) {
         tabPaneSetting.getSelectionModel().select(index);
     }
-    
+ /*   
     public static String getUbidotsVariable(String idSensor){
         return SettingsController.preferences.get(idSensor,"");
     }
@@ -331,18 +331,18 @@ public class SettingsController extends AnchorPane {
     public static void setUbidotsDataSource(String id) {
         SettingsController.preferences.put(UBIDOTS_ID_DATASOURCE, sanitize(id));
     }
-
+*/
     private void setAnimation(Boolean value) {
         SettingsController.preferences.putBoolean(USE_ANIMATION, value);
         notifyEvent();
     }
-    public static Boolean getAllowUbidots(){
+   /* public static Boolean getAllowUbidots(){
         return SettingsController.preferences.getBoolean(USER_ALLOW_UBIDOTS, USER_ALLOW_UBIDOTS_DEFAULT);
     }
     public static String getUbidotsApiKey(){
         return SettingsController.preferences.get(USER_APIKEY, USER_APIKEY_DEFAULT);
     }
-
+*/
     public static boolean getAnimation() {
         return SettingsController.preferences.getBoolean(USE_ANIMATION, USE_ANIMATION_DEFAULT);
     }
@@ -414,13 +414,13 @@ public class SettingsController extends AnchorPane {
         return hms;
     }
 
-    public void openLink(ActionEvent e) {
+    /*public void openLink(ActionEvent e) {
         linkaccount.setVisited(false);
         try {
             Desktop.getDesktop().browse(new URI("https://app.ubidots.com/accounts/signup"));
         } catch (IOException | URISyntaxException e1) {
         }
-    }
+    }*/
     
     /**
      * Abre el navegador para crear una cuenta sensonet
@@ -472,13 +472,13 @@ public class SettingsController extends AnchorPane {
         sensonetEmail.setText(getSensonetUser());
         sensonetPassword.setText(getSensonetPassword());
         sensonetToken.setText(getSensonetProject());
-        apikey.setText(getUbidotsApiKey());
-        setAllowAUbidots(getAllowUbidots());
+       /* apikey.setText(getUbidotsApiKey());
+        setAllowAUbidots(getAllowUbidots());*/
         setSaveAllFiles(getSaveAllFiles());
         setAnimation(getAnimation());
         cbxanimation.setSelected(getAnimation());
         cbxsaveall.setSelected(getSaveAllFiles());
-        cbxubidots.setSelected(getAllowUbidots());
+       // cbxubidots.setSelected(getAllowUbidots());
         workspace.setText(getWorkspace());
 
         sample.setMaxValue(99999999);
@@ -553,11 +553,11 @@ public class SettingsController extends AnchorPane {
     }
     
     
-    private void setUbidotsApiKey(String key){
+   /* private void setUbidotsApiKey(String key){
         
         SettingsController.preferences.put(USER_APIKEY, sanitize(key));
         notifyEvent();
-    }
+    }*/
 
     private void setSaveAllFiles(Boolean value) {
         if (value) {
@@ -579,8 +579,8 @@ public class SettingsController extends AnchorPane {
 
     private SettingsEvent getChange() {
         return new SettingsEvent(
-                getAllowUbidots(),
-                getUbidotsApiKey(),
+                /*getAllowUbidots(),
+                getUbidotsApiKey(),*/
                 getAnimation(),
                 getSaveAllFiles(),
                 getWorkspace(),
@@ -637,7 +637,7 @@ public class SettingsController extends AnchorPane {
         sample.setValue(getSamples());
     }
 
-    private void setAllowAUbidots(Boolean newValue) {
+    /*private void setAllowAUbidots(Boolean newValue) {
         if (newValue) {
             apikey.setDisable(false);
         } else {
@@ -645,7 +645,7 @@ public class SettingsController extends AnchorPane {
         }
         SettingsController.preferences.putBoolean(USER_ALLOW_UBIDOTS, newValue);
         notifyEvent();
-    }
+    }*/
     /**
      * Elimina espacios vacios y saltos de linea.
      */

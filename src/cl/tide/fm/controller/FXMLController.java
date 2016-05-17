@@ -87,7 +87,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
     private long userProgram = 0;
     private Boolean futureSampling;
     private Boolean closing = false;
-    private UbidotsClient ubidots;
+    //private UbidotsClient ubidots;
     private SensonetClient sensonet;
     private Boolean sensonetStatus = false; 
     private String tokenProject = "";
@@ -135,7 +135,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
 
         futureSampling = SettingsController.getFutureSample();
 
-        configUbibots();
+        //configUbibots();
         
         /*if (fmSenso.isConnected()) {
             configChart();
@@ -174,8 +174,8 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         closing = true;
         fmSenso.stop();
         fmSenso.removeFmSensoListener(this);
-        if(ubidots!=null)
-            ubidots.close();
+        /*if(ubidots!=null)
+            ubidots.close();*/
         if (mTab != null) {
             mTab.stop();
         }
@@ -190,8 +190,8 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
     public void onClose() {
         //mChart.stop();
         clickStop();
-        if(ubidots!=null)
-            ubidots.close();
+        /*if(ubidots!=null)
+            ubidots.close();*/
         firmware.setText("");
         System.out.println("Closed");
     }
@@ -394,12 +394,12 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         sampling = true;
         pause = false;
         fm.newWorkbook(getHeader());
-        if(ubidots!= null && !pause)
-            ubidots.tryToConnect(sensors);
+        /*if(ubidots!= null && !pause)
+            ubidots.tryToConnect(sensors);*/
         if(sensonetStatus && !pause)
             sensonet.start(sensors);
-        else 
-            System.err.println(ubidots);
+       /* else 
+            System.err.println(ubidots);*/
         if (fmSenso.isRunning() && userInterval > 999 && userSamples > 0) {
             mTab.start(userInterval);
             /*control.btnSave.setDisable(true);*/
@@ -454,8 +454,8 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
         }
         if(totalSamples>0)
             info("La medición ha finalizado, haga clic en archivo y luego en guardar.", 5000);
-        if(ubidots != null)
-            ubidots.stopUpdate();
+        /*if(ubidots != null)
+            ubidots.stopUpdate();*/
         if(sensonet != null && sensonetStatus)
             sensonet.stop();
     }
@@ -923,13 +923,13 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
             }
         }
         
-        if(event.isAllowUbidots && ubidots == null){
+       /* if(event.isAllowUbidots && ubidots == null){
             configUbibots();
-        }
+        }*/
 
     }
 
-    private void configUbibots() {
+    /*private void configUbibots() {
         if(ubidots!=null)
             ubidots.close();
         ubidots = null;
@@ -960,7 +960,7 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
                 }
             });
         }
-    }
+    }*/
 
     private void configSensonet() {
         sensonetStatus = false;
