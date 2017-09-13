@@ -22,7 +22,7 @@ public class SettingsEvent {
     public String apikeyUbidots;*/
     public String tokenProject;
 
-    public SettingsEvent(/*Boolean allowUbidots,String apikey,*/Boolean isAnimationAvailable, Boolean isSaveAllAvailable, String currentWorkspace, long interval, int samples, Boolean isAvailableFutureSampling, long futureSampling, String token) {
+    public SettingsEvent(/*Boolean allowUbidots,String apikey,*/Boolean isAnimationAvailable, Boolean isSaveAllAvailable, String currentWorkspace, long interval, int samples, Boolean isAvailableFutureSampling, long futureSampling/*, String token*/) {
         this.isAnimationAvailable = isAnimationAvailable;
         this.isSaveAllAvailable = isSaveAllAvailable;
         this.currentWorkspace = currentWorkspace;
@@ -32,8 +32,9 @@ public class SettingsEvent {
         this.futureSamplingMs = futureSampling;
        /* this.isAllowUbidots = allowUbidots;
         this.apikeyUbidots = apikey;*/
-        this.tokenProject = token;
+        //this.tokenProject = token;
     }
+
     
     
 }

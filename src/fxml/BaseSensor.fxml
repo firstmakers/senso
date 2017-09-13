@@ -48,7 +48,7 @@
                   <Font size="14.0" />
                </font>
                <items>
-                  <Menu mnemonicParsing="false" text="nombre...">
+                  <Menu mnemonicParsing="false" text="Nombre...">
                     <items>
                         <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="seleccona el nombre del sensor">
                            <content>
@@ -64,15 +64,15 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <CustomMenuItem hideOnClick="false" mnemonicParsing="false" text="Mostrar la serie del sensor en el gráfico">
                      <content>
-                      <CheckBox fx:id="cbx" text="ver en gráfico">
+                      <CheckBox fx:id="cbx" text="Ver en gráfico">
                            <tooltip>
-                              <Tooltip text="mostrar serie en el gráfico" />
+                              <Tooltip text="Mostrar serie en el gráfico" />
                            </tooltip></CheckBox>
                      </content>
                   </CustomMenuItem>
                </items>
                <tooltip>
-                  <Tooltip text="opciones del sensor" />
+                  <Tooltip text="Opciones del sensor" />
                </tooltip>
                <cursor>
                   <Cursor fx:constant="HAND" />

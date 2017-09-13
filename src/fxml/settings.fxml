@@ -94,7 +94,7 @@
                      </children></AnchorPane>
               </content>
             </Tab>
-            <Tab text="SensoNET">
+            <!--Tab text="SensoNET">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -119,7 +119,7 @@
                      </children>
                   </AnchorPane>
               </content>
-            </Tab>
+            </Tab-->
         </tabs>
       </TabPane>
       <Button fx:id="btnOk" layoutX="516.0" layoutY="230.0" mnemonicParsing="false" prefWidth="120.0" text="Listo" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />

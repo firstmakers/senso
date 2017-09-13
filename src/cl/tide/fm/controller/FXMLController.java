@@ -7,10 +7,8 @@ import cl.tide.fm.device.*;
 import cl.tide.fm.model.*;
 import cl.tide.fm.sensonet.Project;
 import cl.tide.fm.sensonet.SensonetClient;
-import cl.tide.fm.sensonet.SensonetEvents;
 import cl.tide.fm.sensonet.User;
 import cl.tide.fm.tour.Tour;
-import com.ubidots.*;
 import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
@@ -886,9 +884,9 @@ public class FXMLController implements Initializable, FmSensoListener, SettingsC
      */
     @Override
     public void onSettingsChanged(SettingsEvent event) {
-        if(!event.tokenProject.equals(this.tokenProject))
+        /*if(!event.tokenProject.equals(this.tokenProject))
             configSensonet();
-       
+       */
         if (event.interval != userInterval) {
             setInterval(event.interval);
         }//

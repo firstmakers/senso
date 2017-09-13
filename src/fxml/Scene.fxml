@@ -12,7 +12,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="root" fx:id="root" minHeight="600.0" minWidth="800.0" prefHeight="640.0" prefWidth="960.0" styleClass="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cl.tide.fm.controller.FXMLController">
+<AnchorPane id="root" fx:id="root" minHeight="600.0" minWidth="800.0" prefHeight="720.0" prefWidth="1080.0" styleClass="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cl.tide.fm.controller.FXMLController">
    <children>
       <MenuBar fx:id="mainMenu" layoutY="-4.0" prefHeight="29.0" prefWidth="960.0" AnchorPane.leftAnchor="-10.0" AnchorPane.rightAnchor="-10.0">
          <menus>
@@ -30,7 +30,7 @@
                         <CheckMenuItem fx:id="menuThirtySeconds" mnemonicParsing="false" onAction="#handleMenuInterval" text="30 seg." />
                         <CheckMenuItem fx:id="menuOneMin" mnemonicParsing="false" onAction="#handleMenuInterval" text="1 min." />
                         <SeparatorMenuItem mnemonicParsing="false" text="personalizado" />
-                      <MenuItem fx:id="menuCustomInterval" mnemonicParsing="false" onAction="#handleMenuInterval" text="definir ..." />
+                      <MenuItem fx:id="menuCustomInterval" mnemonicParsing="false" onAction="#handleMenuInterval" text="Definir ..." />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Cantidad ">
@@ -39,7 +39,7 @@
                         <CheckMenuItem fx:id="menuOneThousandSamples" mnemonicParsing="false" onAction="#handleMenuSample" text="1000 muestras" />
                         <CheckMenuItem fx:id="menuTenThousandSamples" mnemonicParsing="false" onAction="#handleMenuSample" text="10000 muestras" />
                         <SeparatorMenuItem mnemonicParsing="false" text="personalizado" />
-                        <MenuItem fx:id="menuCustomSample" mnemonicParsing="false" onAction="#handleMenuSample" text="definir ..." />
+                        <MenuItem fx:id="menuCustomSample" mnemonicParsing="false" onAction="#handleMenuSample" text="Definir ..." />
                     </items>
                   </Menu>
                   <MenuItem fx:id="program" mnemonicParsing="false" onAction="#openProgram" text="Programar inicio ..." />
@@ -47,7 +47,7 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Ayuda">
               <items>
-                <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#handleMenuHelp" text="ver ayuda ..." />
+                <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#handleMenuHelp" text="Ver ayuda ..." />
               </items>
             </Menu>
          </menus></MenuBar>
@@ -86,6 +86,11 @@
                            <children>
                               <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                  <children>
+                                    <ImageView fx:id="logo_tide" cacheHint="QUALITY" fitHeight="30.0" fitWidth="135.0" layoutX="23.0" layoutY="17.0" opacity="0.85" pickOnBounds="true" preserveRatio="true" styleClass="logo">
+                                       <image>
+                                          <Image url="@../images/logo_tide.png" />
+                                       </image>
+                                    </ImageView>
                                     <ImageView fx:id="logo" cacheHint="QUALITY" fitHeight="30.0" fitWidth="135.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" styleClass="logo">
                                        <image>
                                           <Image url="@../images/senso_small.png" />

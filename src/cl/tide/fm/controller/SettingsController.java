@@ -149,7 +149,7 @@ public class SettingsController extends AnchorPane {
             stopTimer();
             System.err.println("cerrando configuración");
         });
-        testConnect.focusedProperty().addListener((change)->{
+        /*testConnect.focusedProperty().addListener((change)->{
             infoConnect.setText("");
         });
         sensonetPassword.focusedProperty().addListener(new ChangeListener<Boolean>(){
@@ -167,7 +167,7 @@ public class SettingsController extends AnchorPane {
         autoconnect.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             setSensonetAutoConnect(newValue);
         });
-        
+        */
         /*cbxubidots.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             setAllowAUbidots(newValue);
         });*/
@@ -202,7 +202,7 @@ public class SettingsController extends AnchorPane {
         btnOk.setOnAction((e) -> {
             dialog.close();
         });
-        sensonetToken.textProperty().addListener((obs,oldv,newv)->{
+        /*sensonetToken.textProperty().addListener((obs,oldv,newv)->{
             setSensonetProject(newv);
         });
         
@@ -469,9 +469,9 @@ public class SettingsController extends AnchorPane {
 
     ///////**** PRIVATE METHODS *****\\\\\\\
     private void init() {
-        sensonetEmail.setText(getSensonetUser());
+        /*sensonetEmail.setText(getSensonetUser());
         sensonetPassword.setText(getSensonetPassword());
-        sensonetToken.setText(getSensonetProject());
+        sensonetToken.setText(getSensonetProject());*/
        /* apikey.setText(getUbidotsApiKey());
         setAllowAUbidots(getAllowUbidots());*/
         setSaveAllFiles(getSaveAllFiles());
@@ -587,8 +587,8 @@ public class SettingsController extends AnchorPane {
                 getInterval(),
                 getSamples(),
                 getFutureSample(),
-                getFutureSampleInMS(),
-                getSensonetProject()
+                getFutureSampleInMS()
+                //getSensonetProject()
         );
     }
 
